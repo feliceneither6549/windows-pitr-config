@@ -1,0 +1,10 @@
+# Bei Git gewinnt die letzte passende Zeile - die allgemeine Regel steht deshalb zuerst.
+# In gitattributes the last matching line wins, so the general rule comes first.
+* text=auto
+
+# Die .cmd-Datei muss zwingend CRLF behalten und darf nie in LF umgewandelt werden;
+# cmd.exe kommt mit reinen LF-Zeilenenden nicht zuverlaessig zurecht.
+# The .cmd file must keep CRLF line endings; cmd.exe does not reliably handle LF.
+*.cmd text eol=crlf
+
+*.md text eol=lf
