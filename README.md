@@ -1,5 +1,8 @@
 # windows-pitr-config
 
+[![Download pitr-config.cmd](https://img.shields.io/badge/download-pitr--config.cmd-2ea44f?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/henmedia/windows-pitr-config/releases/latest/download/pitr-config.cmd)
+[![Latest release](https://img.shields.io/github/v/release/henmedia/windows-pitr-config?style=for-the-badge&label=version&color=555555)](https://github.com/henmedia/windows-pitr-config/releases/latest)
+
 Configure **Point-in-time restore** (PITR) on Windows 11 — including the frequency and
 retention settings that Microsoft exposes on the Enterprise edition only.
 
@@ -132,11 +135,19 @@ greyed out — on a machine under no management at all.
 
 ## Usage
 
-Download `pitr-config.cmd` from the [latest release](../../releases/latest) — one file, that
-is the whole download. The version shown under the headline in the window matches the
-release tag it came from.
+[**Download `pitr-config.cmd`**](https://github.com/henmedia/windows-pitr-config/releases/latest/download/pitr-config.cmd)
+— that one file is the whole download, and the link always points at the newest release. The
+version shown under the headline in the window tells you which release you are running.
 
 Double-click `pitr-config.cmd`. It requests administrator rights itself (UAC).
+
+Browsers treat `.cmd` files as executable content, so the download may need one confirmation
+before it is kept. Every release lists the SHA-256 of its file, which is worth comparing
+before running anything that writes to `HKLM`:
+
+```
+Get-FileHash pitr-config.cmd -Algorithm SHA256
+```
 
 | Button | Effect |
 |---|---|
