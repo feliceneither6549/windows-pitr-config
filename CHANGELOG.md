@@ -4,6 +4,23 @@ Notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] — 2026-08-27
+
+### Changed
+
+- Guide and interface no longer address the reader. German had to choose between "du" and
+  "Sie", and Spanish, French and Portuguese between their familiar and polite forms; that
+  choice is now avoided altogether by phrasing everything impersonally. English follows the
+  same register for consistency.
+
+### Fixed
+
+- Last run and next run were shown in US notation on every system, `08/27/2026` instead of
+  `27.08.2026`. PowerShell formats a date inside a double-quoted string with the invariant
+  culture rather than the user's, so `"$date"` silently produced US order. All timestamps now
+  go through one helper that uses the short date and time format of the user's region, the
+  same as the restore point list.
+
 ## [1.3.0] — 2026-08-27
 
 ### Fixed

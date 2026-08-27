@@ -96,16 +96,16 @@
 
   <h2>Getting started</h2>
   <p>Double-click <code>pitr-config.cmd</code>. It asks for administrator rights itself, then
-     opens a window. Nothing is written until you press a button.</p>
-  <p>The language is picked from your Windows display language; the buttons in the top right
-     switch it at any time.</p>
+     opens a window. Nothing is written until a button is pressed.</p>
+  <p>The language follows the Windows display language; the buttons in the top right switch
+     it at any time.</p>
   <p>On start the tool asks GitHub whether a newer version exists and shows a line with a link
      if there is one. It never downloads or installs anything by itself, and a failed check
      stays silent. Starting it as <code>pitr-config.cmd noupdate</code> skips the check.</p>
 
   <h2>The buttons</h2>
   <div class="tablewrap"><table>
-    <tr><th>Apply</th><td>Writes your settings. A new frequency takes effect the next time the scheduled task runs.</td></tr>
+    <tr><th>Apply</th><td>Writes the selected settings. A new frequency takes effect the next time the scheduled task runs.</td></tr>
     <tr><th>Apply and run now</th><td>Writes the settings and runs the task immediately, so a restore point is created and the schedule is recalculated at once.</td></tr>
     <tr><th>Refresh</th><td>Re-reads the current state.</td></tr>
     <tr><th>Reset everything</th><td>Removes every value the tool has written, after asking. Windows returns to its own defaults.</td></tr>
@@ -119,16 +119,16 @@
     <li><b>Maximum storage</b> — 2 to 50 GB for all restore points together.</li>
   </ul>
   <p>Each list starts with <b>Windows default</b>, which removes that single override again.
-     Underneath each list, in grey, you can see the value currently in effect and where it
-     comes from.</p>
+     Underneath each list, in grey, stands the value currently in effect and where it comes
+     from.</p>
 
   <h2>Three things worth knowing</h2>
   <div class="note">
     <p><b>Frequency is an earliest possible interval, not a promise.</b> Restore points are
-       only created while the system is idle. If you are using the machine, or it is switched
-       off, the run is postponed and a slot can be skipped entirely. Setting one hour on a
-       machine used all day will not produce twenty-four points. The window shows the task
-       status so you can see when a run is waiting.</p>
+       only created while the system is idle. If the machine is in use, or switched off, the
+       run is postponed and a slot can be skipped entirely. Setting one hour on a machine used
+       all day will not produce twenty-four points. The window shows the task status, so a run
+       that is waiting stays visible.</p>
     <p><b>Only the Windows drive is covered.</b> Other partitions and other disks are not
        included, not even on the same physical disk. Data there is neither protected nor
        rolled back, and still needs a backup of its own.</p>
@@ -158,8 +158,8 @@
 
   <h2>Erste Schritte</h2>
   <p><code>pitr-config.cmd</code> doppelklicken. Die Datei fordert selbst Administratorrechte
-     an und öffnet ein Fenster. Geschrieben wird erst, wenn Sie eine Schaltfläche drücken.</p>
-  <p>Die Sprache richtet sich nach Ihrer Windows-Anzeigesprache; die Schaltflächen oben rechts
+     an und öffnet ein Fenster. Geschrieben wird erst beim Druck auf eine Schaltfläche.</p>
+  <p>Die Sprache richtet sich nach der Windows-Anzeigesprache; die Schaltflächen oben rechts
      stellen sie jederzeit um.</p>
   <p>Beim Start fragt das Werkzeug bei GitHub nach, ob es eine neuere Fassung gibt, und zeigt
      dann eine Zeile mit Link. Heruntergeladen oder installiert wird nie etwas von allein, und
@@ -168,7 +168,7 @@
 
   <h2>Die Schaltflächen</h2>
   <div class="tablewrap"><table>
-    <tr><th>Übernehmen</th><td>Schreibt Ihre Einstellungen. Eine neue Häufigkeit wird beim nächsten Lauf der geplanten Aufgabe wirksam.</td></tr>
+    <tr><th>Übernehmen</th><td>Schreibt die gewählten Einstellungen. Eine neue Häufigkeit wird beim nächsten Lauf der geplanten Aufgabe wirksam.</td></tr>
     <tr><th>Übernehmen und sofort ausführen</th><td>Schreibt die Einstellungen und stößt die Aufgabe direkt an, sodass sofort ein Punkt entsteht und der Zeitplan neu berechnet wird.</td></tr>
     <tr><th>Aktualisieren</th><td>Liest den aktuellen Zustand neu ein.</td></tr>
     <tr><th>Alles zurücksetzen</th><td>Entfernt nach Rückfrage alle vom Werkzeug geschriebenen Werte. Windows kehrt zu seinen eigenen Vorgaben zurück.</td></tr>
@@ -223,9 +223,9 @@
      endroit où l'outil peut écrire directement.</p>
 
   <h2>Premiers pas</h2>
-  <p>Double-cliquez sur <code>pitr-config.cmd</code>. Le fichier demande lui-même les droits
-     d'administrateur et ouvre une fenêtre. Rien n'est écrit tant que vous n'avez pas appuyé
-     sur un bouton.</p>
+  <p>Double-clic sur <code>pitr-config.cmd</code>. Le fichier demande lui-même les droits
+     d'administrateur et ouvre une fenêtre. Rien n'est écrit tant qu'aucun bouton n'a été
+     actionné.</p>
   <p>La langue suit la langue d'affichage de Windows ; les boutons en haut à droite la
      changent à tout moment.</p>
   <p>Au démarrage, l'outil demande à GitHub s'il existe une version plus récente et affiche le
@@ -235,7 +235,7 @@
 
   <h2>Les boutons</h2>
   <div class="tablewrap"><table>
-    <tr><th>Appliquer</th><td>Écrit vos réglages. Une nouvelle fréquence prend effet à la prochaine exécution de la tâche planifiée.</td></tr>
+    <tr><th>Appliquer</th><td>Écrit les réglages choisis. Une nouvelle fréquence prend effet à la prochaine exécution de la tâche planifiée.</td></tr>
     <tr><th>Appliquer et exécuter maintenant</th><td>Écrit les réglages et lance la tâche immédiatement : un point est créé et la planification est recalculée aussitôt.</td></tr>
     <tr><th>Actualiser</th><td>Relit l'état actuel.</td></tr>
     <tr><th>Tout réinitialiser</th><td>Supprime, après confirmation, toutes les valeurs écrites par l'outil. Windows revient à ses propres valeurs par défaut.</td></tr>
@@ -255,11 +255,11 @@
   <h2>Trois choses à savoir</h2>
   <div class="note">
     <p><b>La fréquence est un intervalle minimal, pas une promesse.</b> Les points de
-       restauration ne sont créés que lorsque le système est inactif. Si vous utilisez la
-       machine, ou si elle est éteinte, l'exécution est reportée et un créneau peut être
+       restauration ne sont créés que lorsque le système est inactif. Si la machine est
+       utilisée, ou si elle est éteinte, l'exécution est reportée et un créneau peut être
        ignoré. Régler une heure sur une machine utilisée toute la journée ne produira pas
-       vingt-quatre points. La fenêtre affiche l'état de la tâche pour que vous voyiez quand
-       une exécution est en attente.</p>
+       vingt-quatre points. La fenêtre affiche l'état de la tâche, ce qui rend visible une
+       exécution en attente.</p>
     <p><b>Seul le lecteur Windows est pris en compte.</b> Les autres partitions et les autres
        disques sont exclus, même sur le même disque physique. Les données qui s'y trouvent ne
        sont ni protégées ni restaurées et ont toujours besoin de leur propre sauvegarde.</p>
@@ -288,7 +288,7 @@
      lugar en el que la herramienta puede escribir directamente.</p>
 
   <h2>Primeros pasos</h2>
-  <p>Haga doble clic en <code>pitr-config.cmd</code>. El archivo solicita por sí mismo permisos
+  <p>Doble clic en <code>pitr-config.cmd</code>. El archivo solicita por sí mismo permisos
      de administrador y abre una ventana. No se escribe nada hasta que pulse un botón.</p>
   <p>El idioma se toma del idioma de presentación de Windows; los botones de arriba a la
      derecha lo cambian en cualquier momento.</p>
@@ -299,7 +299,7 @@
 
   <h2>Los botones</h2>
   <div class="tablewrap"><table>
-    <tr><th>Aplicar</th><td>Escribe sus ajustes. Una frecuencia nueva surte efecto en la siguiente ejecución de la tarea programada.</td></tr>
+    <tr><th>Aplicar</th><td>Escribe los ajustes elegidos. Una frecuencia nueva surte efecto en la siguiente ejecución de la tarea programada.</td></tr>
     <tr><th>Aplicar y ejecutar ahora</th><td>Escribe los ajustes y ejecuta la tarea de inmediato, de modo que se crea un punto y el calendario se recalcula al instante.</td></tr>
     <tr><th>Actualizar</th><td>Vuelve a leer el estado actual.</td></tr>
     <tr><th>Restablecer todo</th><td>Elimina, tras confirmación, todos los valores escritos por la herramienta. Windows vuelve a sus propios valores predeterminados.</td></tr>
@@ -322,7 +322,7 @@
        solo se crean cuando el sistema está inactivo. Si está usando el equipo, o si está
        apagado, la ejecución se aplaza y una cita puede omitirse por completo. Configurar una
        hora en un equipo que se usa todo el día no producirá veinticuatro puntos. La ventana
-       muestra el estado de la tarea para que vea cuándo hay una ejecución en espera.</p>
+       muestra el estado de la tarea, de modo que una ejecución en espera queda a la vista.</p>
     <p><b>Solo se incluye la unidad de Windows.</b> Otras particiones y otros discos quedan
        fuera, incluso en el mismo disco físico. Los datos que haya allí no se protegen ni se
        revierten, y siguen necesitando su propia copia de seguridad.</p>
@@ -351,9 +351,9 @@
      lugar onde a ferramenta pode gravar diretamente.</p>
 
   <h2>Primeiros passos</h2>
-  <p>Dê um duplo clique em <code>pitr-config.cmd</code>. O arquivo solicita por conta própria
-     direitos de administrador e abre uma janela. Nada é gravado até você pressionar um
-     botão.</p>
+  <p>Duplo clique em <code>pitr-config.cmd</code>. O arquivo solicita por conta própria
+     direitos de administrador e abre uma janela. Nada é gravado até que um botão seja
+     pressionado.</p>
   <p>O idioma segue o idioma de exibição do Windows; os botões no canto superior direito
      mudam o idioma a qualquer momento.</p>
   <p>Ao iniciar, a ferramenta pergunta ao GitHub se existe uma versão mais nova e, nesse caso,
@@ -363,7 +363,7 @@
 
   <h2>Os botões</h2>
   <div class="tablewrap"><table>
-    <tr><th>Aplicar</th><td>Grava suas configurações. Uma nova frequência entra em vigor na próxima execução da tarefa agendada.</td></tr>
+    <tr><th>Aplicar</th><td>Grava as configurações escolhidas. Uma nova frequência entra em vigor na próxima execução da tarefa agendada.</td></tr>
     <tr><th>Aplicar e executar agora</th><td>Grava as configurações e executa a tarefa imediatamente, criando um ponto e recalculando o agendamento na hora.</td></tr>
     <tr><th>Atualizar</th><td>Relê o estado atual.</td></tr>
     <tr><th>Redefinir tudo</th><td>Remove, após confirmação, todos os valores gravados pela ferramenta. O Windows volta aos próprios padrões.</td></tr>
@@ -383,11 +383,10 @@
   <h2>Três coisas que vale saber</h2>
   <div class="note">
     <p><b>A frequência é um intervalo mínimo, não uma promessa.</b> Os pontos de restauração só
-       são criados quando o sistema está ocioso. Se você estiver usando o computador, ou se ele
-       estiver desligado, a execução é adiada e um horário pode ser pulado por completo.
-       Configurar uma hora em um computador usado o dia inteiro não vai gerar vinte e quatro
-       pontos. A janela mostra o status da tarefa para você ver quando uma execução está
-       aguardando.</p>
+       são criados quando o sistema está ocioso. Se o computador estiver em uso, ou desligado,
+       a execução é adiada e um horário pode ser pulado por completo. Configurar uma hora em um
+       computador usado o dia inteiro não vai gerar vinte e quatro pontos. A janela mostra o
+       status da tarefa, de modo que uma execução aguardando fica visível.</p>
     <p><b>Apenas a unidade do Windows é incluída.</b> Outras partições e outros discos ficam de
        fora, mesmo no mesmo disco físico. Os dados ali não são protegidos nem revertidos e
        continuam precisando do próprio backup.</p>

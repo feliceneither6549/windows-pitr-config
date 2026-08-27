@@ -80,7 +80,7 @@ $ErrorActionPreference = 'Stop'
 # The one place the version is defined. It appears under the headline in the window
 # and in the selftest; a release is tagged with "v" followed by this value. Keeping
 # it out of the batch header above avoids having two numbers that can drift apart.
-$Version  = '1.3.0'
+$Version  = '1.3.1'
 
 # Asked on start unless PITR_NOUPDATE is set. Returns the newest release of the project.
 $UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases/latest'
@@ -138,9 +138,9 @@ en = @{
     intro      = 'Windows offers frequency and retention on the Enterprise edition only. This tool writes them straight into the PITR engine configuration, which performs no edition check.'
     lnkGuide   = 'Guide'
     tipProject = 'Open the project page on GitHub'
-    tipGuide   = 'Open the short guide in your browser'
+    tipGuide   = 'Open the short guide in the browser'
     updAvail   = 'Version {0} is available - open the release page'
-    tipUpdate  = 'Opens the download page in your browser. Nothing is downloaded or installed automatically.'
+    tipUpdate  = 'Opens the download page in the browser. Nothing is downloaded or installed automatically.'
 
     grpState   = 'Current state'
     capEdition = 'Windows edition:'
@@ -154,7 +154,7 @@ en = @{
     tsDisabled = 'disabled'
     tsOverdue  = 'overdue by'
     missedRuns = 'runs skipped: {0}'
-    noteIdle   = 'Restore points are only created while the system is idle. If the machine is in use or switched off, the run is postponed - and a scheduled slot may be skipped entirely. The configured frequency is therefore an earliest possible interval, not a guarantee. Use "Apply and run now" to force a point at any time.'
+    noteIdle   = 'Restore points are only created while the system is idle. If the machine is in use or switched off, the run is postponed - and a scheduled slot may be skipped entirely. The configured frequency is therefore an earliest possible interval, not a guarantee. "Apply and run now" forces a point at any time.'
 
     grpPoints  = 'Restore points'
     lblCount   = 'Count'
@@ -472,7 +472,7 @@ es = @{
     tsDisabled = 'desactivada'
     tsOverdue  = 'retrasada'
     missedRuns = 'ejecuciones omitidas: {0}'
-    noteIdle   = 'Los puntos de restauración solo se crean cuando el sistema está inactivo. Si el equipo se está usando o está apagado, la ejecución se aplaza — y una cita programada puede omitirse por completo. Por eso la frecuencia configurada es el intervalo mínimo posible, no una garantía. Con «Aplicar y ejecutar ahora» puede forzar un punto en cualquier momento.'
+    noteIdle   = 'Los puntos de restauración solo se crean cuando el sistema está inactivo. Si el equipo se está usando o está apagado, la ejecución se aplaza — y una cita programada puede omitirse por completo. Por eso la frecuencia configurada es el intervalo mínimo posible, no una garantía. Con «Aplicar y ejecutar ahora» se puede forzar un punto en cualquier momento.'
 
     grpPoints  = 'Puntos de restauración'
     lblCount   = 'Cantidad'
@@ -576,7 +576,7 @@ pt = @{
     tsDisabled = 'desativada'
     tsOverdue  = 'atrasada em'
     missedRuns = 'execuções perdidas: {0}'
-    noteIdle   = 'Os pontos de restauração só são criados quando o sistema está ocioso. Se o computador estiver em uso ou desligado, a execução é adiada — e um horário agendado pode ser pulado por completo. Por isso a frequência configurada é um intervalo mínimo, não uma garantia. Use "Aplicar e executar agora" para forçar um ponto a qualquer momento.'
+    noteIdle   = 'Os pontos de restauração só são criados quando o sistema está ocioso. Se o computador estiver em uso ou desligado, a execução é adiada — e um horário agendado pode ser pulado por completo. Por isso a frequência configurada é um intervalo mínimo, não uma garantia. "Aplicar e executar agora" força um ponto a qualquer momento.'
 
     grpPoints  = 'Pontos de restauração'
     lblCount   = 'Quantidade'
@@ -725,6 +725,16 @@ function Format-Duration {
     $hr = [math]::Round($h, 1)
     $hu = if ($hr -eq 1) { T 'unitHour' } else { T 'unitHours' }
     return "$hr $hu"
+}
+
+# PowerShell formatiert ein Datum in Anfuehrungszeichen mit der INVARIANTEN Kultur, nicht
+# mit der des Nutzers: "$datum" ergibt 08/27/2026 auch auf einem deutschen System. Jede
+# Zeitangabe geht deshalb ausdruecklich ueber ToString('g') - das ist das kurze Datums- und
+# Zeitformat der Region, dasselbe wie in der Punkteliste.
+function Format-Stamp {
+    param($Value)
+    if ($null -eq $Value) { return '-' }
+    try { return ([datetime]$Value).ToString('g') } catch { return "$Value" }
 }
 
 function Format-Age {
@@ -1207,11 +1217,11 @@ function Update-View {
     try {
         $task = Get-ScheduledTask -TaskPath $TaskPath -TaskName $TaskName
         $info = Get-ScheduledTaskInfo -TaskPath $TaskPath -TaskName $TaskName
-        $ctl.TxtLast.Text = "$($info.LastRunTime)"
+        $ctl.TxtLast.Text = Format-Stamp $info.LastRunTime
 
         # Der Lauf findet nur im Leerlauf statt - ein ueberfaelliger Termin ist daher
         # kein Fehler, sondern der Normalfall an einem benutzten Rechner.
-        $nextTxt = "$($info.NextRunTime)"
+        $nextTxt = Format-Stamp $info.NextRunTime
         if ($info.NextRunTime -and $info.NextRunTime -lt (Get-Date)) {
             $due = [math]::Round(((Get-Date) - $info.NextRunTime).TotalMinutes)
             $nextTxt += "  —  $(T 'tsOverdue') $due $(T 'unitMin')"
@@ -1351,7 +1361,7 @@ function Invoke-TaskNow {
         Write-Log (T 'logIdleOn')
 
         $info = Get-ScheduledTaskInfo -TaskPath $TaskPath -TaskName $TaskName
-        Write-Log "$(T 'logDone'): $($info.LastTaskResult), $(T 'logNextRun'): $($info.NextRunTime)"
+        Write-Log "$(T 'logDone'): $($info.LastTaskResult), $(T 'logNextRun'): $(Format-Stamp $info.NextRunTime)"
     } finally {
         if (-not $restored) {
             try {
