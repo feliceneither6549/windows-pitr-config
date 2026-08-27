@@ -28,7 +28,7 @@ any time. The window also links to the project and to the
 language you are currently using.
 
 ![The tool running on Windows 11 Pro: current state, existing restore points, and the four
-settings](docs/screenshot.png?v=1.4.0)
+settings](docs/screenshot.png?v=1.4.1)
 <!-- The ?v= is a cache buster. GitHub proxies README images and caches them by URL,
      so replacing the file alone keeps serving the old picture for a long time.
      Bump this whenever the screenshot is regenerated. -->
@@ -168,6 +168,11 @@ configured at all.
 version shown under the headline in the window tells you which release you are running.
 
 Double-click `pitr-config.cmd`. It requests administrator rights itself (UAC).
+
+Running it straight from a network share works as well. `cmd.exe` used to print a warning of
+its own in that case — *UNC paths are not supported*, falling back to `C:\Windows` — which
+looks like a failure but is none: the tool works from its own full path and never touches the
+current directory. Since 1.4.1 that message is cleared from the console on start.
 
 A [short guide](https://henmedia.github.io/windows-pitr-config/guide.html) covers the same
 ground in all five languages. Downloading `guide.html` next to `pitr-config.cmd` makes the

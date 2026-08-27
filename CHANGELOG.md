@@ -4,6 +4,25 @@ Notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] — 2026-08-27
+
+### Changed
+
+- The guide mentions that the file runs just as well from a USB stick or a network share.
+- The Spanish guide still addressed the reader in one place (*hasta que pulse un botón*),
+  missed when the address forms were removed in 1.3.1.
+
+### Fixed
+
+- Started from a network share, `cmd.exe` printed a warning of its own before the tool ran:
+  *UNC paths are not supported*, falling back to `C:\Windows` as the current directory. It
+  reads like a failure but has none — the loader only ever uses its own full path and never
+  the current directory. `@echo off` cannot suppress the message, because `cmd.exe` writes it
+  itself, to stderr, before the first line of the file runs. The loader now recognises a start
+  from a UNC path and clears the message from the console, leaving a short line in its place.
+  The selftest is deliberately left alone: it writes into a console whose contents nobody
+  wants cleared.
+
 ## [1.4.0] — 2026-08-27
 
 ### Added

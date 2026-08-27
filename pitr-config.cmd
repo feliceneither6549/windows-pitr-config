@@ -24,6 +24,21 @@ setlocal
 
 if /i "%~1"=="selftest" goto :selftest
 
+rem  Started from a network share, cmd.exe prints a warning of its own before the first
+rem  line here runs: UNC paths are not supported as the current directory, and it falls
+rem  back to C:\Windows. "@echo off" cannot suppress it - cmd.exe writes it itself, to
+rem  stderr. It reads like a failure but has no consequence: the loader works with %~f0,
+rem  its own full path, and never needs the current directory. So wipe it and put a calm
+rem  line in its place. Only in window mode - the selftest writes into a console whose
+rem  contents nobody wants cleared.
+set "P0=%~f0"
+if "%P0:~0,2%"=="\\" (
+  cls
+  echo.
+  echo   pitr-config - starting, please wait ...
+  echo.
+)
+
 rem  The argument has to survive the elevation, because the elevated instance is a new
 rem  process that does not inherit it. It is therefore passed on explicitly.
 set "PITR_NOUPDATE="
@@ -80,7 +95,7 @@ $ErrorActionPreference = 'Stop'
 # The one place the version is defined. It appears under the headline in the window
 # and in the selftest; a release is tagged with "v" followed by this value. Keeping
 # it out of the batch header above avoids having two numbers that can drift apart.
-$Version  = '1.4.0'
+$Version  = '1.4.1'
 
 # Asked on start unless PITR_NOUPDATE is set. Returns the newest release of the project.
 $UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases/latest'
