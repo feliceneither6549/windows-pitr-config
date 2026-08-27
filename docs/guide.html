@@ -94,6 +94,15 @@
      in the engine underneath, and the engine takes its configuration from a place the tool
      can write to directly.</p>
 
+  <h2>A snapshot whenever one is wanted</h2>
+  <p>The green button at the top of the window, <b>Create snapshot now</b>, creates a restore
+     point immediately — no waiting for the schedule, and no setting touched. One click worth
+     spending before a driver installation, an edit to the registry, or a first run of
+     unfamiliar software.</p>
+  <p>It takes a moment: the task runs, Windows writes the shadow copy, and the new point then
+     appears in the list below. Since the scheduled task otherwise runs only while the machine
+     is idle, the button lifts that condition for this one run and restores it afterwards.</p>
+
   <h2>Getting started</h2>
   <p>Double-click <code>pitr-config.cmd</code>. It asks for administrator rights itself, then
      opens a window. Nothing is written until a button is pressed.</p>
@@ -105,6 +114,7 @@
 
   <h2>The buttons</h2>
   <div class="tablewrap"><table>
+    <tr><th>Create snapshot now</th><td>Creates a restore point at once, without changing any setting. The highlighted button at the top of the window.</td></tr>
     <tr><th>Apply</th><td>Writes the selected settings. A new frequency takes effect the next time the scheduled task runs.</td></tr>
     <tr><th>Apply and run now</th><td>Writes the settings and runs the task immediately, so a restore point is created and the schedule is recalculated at once.</td></tr>
     <tr><th>Refresh</th><td>Re-reads the current state.</td></tr>
@@ -156,6 +166,16 @@
      Einstellungen, nicht in der darunterliegenden Engine, und die Engine liest ihre
      Konfiguration von einer Stelle, die das Werkzeug direkt beschreiben kann.</p>
 
+  <h2>Ein Schnappschuss, wann immer er gebraucht wird</h2>
+  <p>Die grüne Schaltfläche oben im Fenster, <b>Schnappschuss jetzt erstellen</b>, legt sofort
+     einen Wiederherstellungspunkt an — ohne auf den Zeitplan zu warten und ohne dass sich an
+     einer Einstellung etwas ändert. Ein Klick, der sich vor einer Treiberinstallation, einem
+     Eingriff in die Registry oder dem ersten Start unbekannter Software lohnt.</p>
+  <p>Es dauert einen Moment: Die Aufgabe läuft, Windows schreibt die Schattenkopie, danach
+     erscheint der neue Punkt in der Liste darunter. Weil die geplante Aufgabe sonst nur im
+     Leerlauf läuft, hebt die Schaltfläche diese Bedingung für diesen einen Lauf auf und stellt
+     sie danach wieder her.</p>
+
   <h2>Erste Schritte</h2>
   <p><code>pitr-config.cmd</code> doppelklicken. Die Datei fordert selbst Administratorrechte
      an und öffnet ein Fenster. Geschrieben wird erst beim Druck auf eine Schaltfläche.</p>
@@ -168,6 +188,7 @@
 
   <h2>Die Schaltflächen</h2>
   <div class="tablewrap"><table>
+    <tr><th>Schnappschuss jetzt erstellen</th><td>Legt sofort einen Wiederherstellungspunkt an, ohne eine Einstellung zu ändern. Die hervorgehobene Schaltfläche oben im Fenster.</td></tr>
     <tr><th>Übernehmen</th><td>Schreibt die gewählten Einstellungen. Eine neue Häufigkeit wird beim nächsten Lauf der geplanten Aufgabe wirksam.</td></tr>
     <tr><th>Übernehmen und sofort ausführen</th><td>Schreibt die Einstellungen und stößt die Aufgabe direkt an, sodass sofort ein Punkt entsteht und der Zeitplan neu berechnet wird.</td></tr>
     <tr><th>Aktualisieren</th><td>Liest den aktuellen Zustand neu ein.</td></tr>
@@ -222,6 +243,16 @@
      Paramètres, pas dans le moteur sous-jacent, et ce moteur lit sa configuration à un
      endroit où l'outil peut écrire directement.</p>
 
+  <h2>Un instantané dès qu'on en a besoin</h2>
+  <p>Le bouton vert en haut de la fenêtre, <b>Créer un instantané maintenant</b>, crée
+     immédiatement un point de restauration — sans attendre la planification et sans toucher au
+     moindre réglage. Un clic qui vaut la peine avant l'installation d'un pilote, une
+     intervention dans le registre ou le premier lancement d'un logiciel inconnu.</p>
+  <p>Cela prend un moment : la tâche s'exécute, Windows écrit le cliché instantané, puis le
+     nouveau point apparaît dans la liste en dessous. Comme la tâche planifiée ne s'exécute
+     autrement que pendant l'inactivité, le bouton lève cette condition pour cette seule
+     exécution et la rétablit ensuite.</p>
+
   <h2>Premiers pas</h2>
   <p>Double-clic sur <code>pitr-config.cmd</code>. Le fichier demande lui-même les droits
      d'administrateur et ouvre une fenêtre. Rien n'est écrit tant qu'aucun bouton n'a été
@@ -235,6 +266,7 @@
 
   <h2>Les boutons</h2>
   <div class="tablewrap"><table>
+    <tr><th>Créer un instantané maintenant</th><td>Crée aussitôt un point de restauration, sans modifier le moindre réglage. Le bouton mis en évidence en haut de la fenêtre.</td></tr>
     <tr><th>Appliquer</th><td>Écrit les réglages choisis. Une nouvelle fréquence prend effet à la prochaine exécution de la tâche planifiée.</td></tr>
     <tr><th>Appliquer et exécuter maintenant</th><td>Écrit les réglages et lance la tâche immédiatement : un point est créé et la planification est recalculée aussitôt.</td></tr>
     <tr><th>Actualiser</th><td>Relit l'état actuel.</td></tr>
@@ -287,6 +319,16 @@
      de Configuración, no en el motor que hay debajo, y ese motor lee su configuración de un
      lugar en el que la herramienta puede escribir directamente.</p>
 
+  <h2>Una instantánea cuando haga falta</h2>
+  <p>El botón verde de la parte superior de la ventana, <b>Crear instantánea ahora</b>, crea de
+     inmediato un punto de restauración: sin esperar a la programación y sin tocar ningún
+     ajuste. Un clic que merece la pena antes de instalar un controlador, modificar el registro
+     o abrir por primera vez un programa desconocido.</p>
+  <p>Tarda un momento: la tarea se ejecuta, Windows escribe la instantánea de volumen y después
+     el punto nuevo aparece en la lista de abajo. Como por lo demás la tarea programada solo se
+     ejecuta con el equipo inactivo, el botón levanta esa condición para esta única ejecución y
+     la restablece al terminar.</p>
+
   <h2>Primeros pasos</h2>
   <p>Doble clic en <code>pitr-config.cmd</code>. El archivo solicita por sí mismo permisos
      de administrador y abre una ventana. No se escribe nada hasta que pulse un botón.</p>
@@ -299,6 +341,7 @@
 
   <h2>Los botones</h2>
   <div class="tablewrap"><table>
+    <tr><th>Crear instantánea ahora</th><td>Crea al instante un punto de restauración, sin cambiar ningún ajuste. El botón destacado en la parte superior de la ventana.</td></tr>
     <tr><th>Aplicar</th><td>Escribe los ajustes elegidos. Una frecuencia nueva surte efecto en la siguiente ejecución de la tarea programada.</td></tr>
     <tr><th>Aplicar y ejecutar ahora</th><td>Escribe los ajustes y ejecuta la tarea de inmediato, de modo que se crea un punto y el calendario se recalcula al instante.</td></tr>
     <tr><th>Actualizar</th><td>Vuelve a leer el estado actual.</td></tr>
@@ -350,6 +393,15 @@
      app Configurações, não no mecanismo por baixo, e esse mecanismo lê sua configuração de um
      lugar onde a ferramenta pode gravar diretamente.</p>
 
+  <h2>Um instantâneo quando for preciso</h2>
+  <p>O botão verde no alto da janela, <b>Criar instantâneo agora</b>, cria imediatamente um
+     ponto de restauração: sem esperar pelo agendamento e sem alterar nenhuma configuração. Um
+     clique que vale a pena antes de instalar um driver, mexer no registro ou abrir pela
+     primeira vez um programa desconhecido.</p>
+  <p>Leva um instante: a tarefa é executada, o Windows grava a cópia de sombra e o novo ponto
+     aparece na lista abaixo. Como a tarefa agendada, de resto, só é executada com o computador
+     ocioso, o botão suspende essa condição nessa única execução e a restabelece em seguida.</p>
+
   <h2>Primeiros passos</h2>
   <p>Duplo clique em <code>pitr-config.cmd</code>. O arquivo solicita por conta própria
      direitos de administrador e abre uma janela. Nada é gravado até que um botão seja
@@ -363,6 +415,7 @@
 
   <h2>Os botões</h2>
   <div class="tablewrap"><table>
+    <tr><th>Criar instantâneo agora</th><td>Cria na hora um ponto de restauração, sem alterar nenhuma configuração. O botão destacado no alto da janela.</td></tr>
     <tr><th>Aplicar</th><td>Grava as configurações escolhidas. Uma nova frequência entra em vigor na próxima execução da tarefa agendada.</td></tr>
     <tr><th>Aplicar e executar agora</th><td>Grava as configurações e executa a tarefa imediatamente, criando um ponto e recalculando o agendamento na hora.</td></tr>
     <tr><th>Atualizar</th><td>Relê o estado atual.</td></tr>

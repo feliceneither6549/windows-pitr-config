@@ -80,7 +80,7 @@ $ErrorActionPreference = 'Stop'
 # The one place the version is defined. It appears under the headline in the window
 # and in the selftest; a release is tagged with "v" followed by this value. Keeping
 # it out of the batch header above avoids having two numbers that can drift apart.
-$Version  = '1.3.1'
+$Version  = '1.4.0'
 
 # Asked on start unless PITR_NOUPDATE is set. Returns the newest release of the project.
 $UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases/latest'
@@ -154,7 +154,7 @@ en = @{
     tsDisabled = 'disabled'
     tsOverdue  = 'overdue by'
     missedRuns = 'runs skipped: {0}'
-    noteIdle   = 'Restore points are only created while the system is idle. If the machine is in use or switched off, the run is postponed - and a scheduled slot may be skipped entirely. The configured frequency is therefore an earliest possible interval, not a guarantee. "Apply and run now" forces a point at any time.'
+    noteIdle   = 'Restore points are only created while the system is idle. If the machine is in use or switched off, the run is postponed - and a scheduled slot may be skipped entirely. The configured frequency is therefore an earliest possible interval, not a guarantee. "Create snapshot now" at the top forces a point whenever one is wanted.'
 
     grpPoints  = 'Restore points'
     lblCount   = 'Count'
@@ -199,6 +199,9 @@ en = @{
     btnRefresh = 'Refresh'
     btnApply   = 'Apply'
     btnApplyNow= 'Apply and run now'
+    btnSnapNow = 'Create snapshot now'
+    snapHint   = 'Creates a restore point right away, whatever the schedule says. The settings below stay untouched.'
+    tipSnapNow = 'Runs PITRTask once, even while the machine is in use. Nothing is written to the configuration.'
     grpLog     = 'Log'
 
     effective  = 'Currently effective'
@@ -260,7 +263,7 @@ de = @{
     tsDisabled = 'deaktiviert'
     tsOverdue  = 'überfällig seit'
     missedRuns = 'ausgefallene Läufe: {0}'
-    noteIdle   = 'Wiederherstellungspunkte entstehen nur, wenn das System im Leerlauf ist. Wird der Rechner gerade benutzt oder ist er ausgeschaltet, verschiebt sich der Lauf — ein Termin kann dadurch auch ganz ausfallen. Die eingestellte Häufigkeit ist deshalb ein frühestmöglicher Abstand, keine Garantie. Mit „Übernehmen und sofort ausführen" lässt sich jederzeit ein Punkt erzwingen.'
+    noteIdle   = 'Wiederherstellungspunkte entstehen nur, wenn das System im Leerlauf ist. Wird der Rechner gerade benutzt oder ist er ausgeschaltet, verschiebt sich der Lauf — ein Termin kann dadurch auch ganz ausfallen. Die eingestellte Häufigkeit ist deshalb ein frühestmöglicher Abstand, keine Garantie. Mit „Schnappschuss jetzt erstellen“ ganz oben lässt sich jederzeit ein Punkt erzwingen.'
 
     grpPoints  = 'Wiederherstellungspunkte'
     lblCount   = 'Anzahl'
@@ -305,6 +308,9 @@ de = @{
     btnRefresh = 'Aktualisieren'
     btnApply   = 'Übernehmen'
     btnApplyNow= 'Übernehmen und sofort ausführen'
+    btnSnapNow = 'Schnappschuss jetzt erstellen'
+    snapHint   = 'Erzeugt sofort einen Wiederherstellungspunkt, unabhängig vom Zeitplan. Die Einstellungen unten bleiben unberührt.'
+    tipSnapNow = 'Führt PITRTask einmal aus, auch während der Rechner benutzt wird. An der Konfiguration ändert sich nichts.'
     grpLog     = 'Protokoll'
 
     effective  = 'Aktuell wirksam'
@@ -317,7 +323,7 @@ de = @{
 
     carryOver  = 'stammt noch aus der vorherigen Einstellung; wird beim nächsten Lauf angepasst auf'
     proven72   = 'älter als 72 Stunden: die erweiterte Aufbewahrung wirkt nachweislich'
-    unofficial = 'Inoffizielle Lösung: Die hier gesetzten Konfigurationswerte sind von Microsoft nicht dokumentiert und können sich mit künftigen Windows-Versionen ändern. „Alles zurücksetzen" stellt jederzeit den Windows-Standard wieder her.'
+    unofficial = 'Inoffizielle Lösung: Die hier gesetzten Konfigurationswerte sind von Microsoft nicht dokumentiert und können sich mit künftigen Windows-Versionen ändern. „Alles zurücksetzen“ stellt jederzeit den Windows-Standard wieder her.'
     taskMissing= 'PITRTask nicht gefunden'
     unknownTxt = 'unbekannt'
 
@@ -368,7 +374,7 @@ fr = @{
     tsDisabled = 'désactivée'
     tsOverdue  = 'en retard de'
     missedRuns = 'exécutions manquées : {0}'
-    noteIdle   = 'Les points de restauration ne sont créés que lorsque le système est inactif. Si la machine est utilisée ou éteinte, l''exécution est reportée — et un créneau planifié peut être ignoré entièrement. La fréquence configurée est donc un intervalle minimal, pas une garantie. « Appliquer et exécuter maintenant » force un point à tout moment.'
+    noteIdle   = 'Les points de restauration ne sont créés que lorsque le système est inactif. Si la machine est utilisée ou éteinte, l''exécution est reportée — et un créneau planifié peut être ignoré entièrement. La fréquence configurée est donc un intervalle minimal, pas une garantie. « Créer un instantané maintenant », tout en haut, force un point à tout moment.'
 
     grpPoints  = 'Points de restauration'
     lblCount   = 'Nombre'
@@ -413,6 +419,9 @@ fr = @{
     btnRefresh = 'Actualiser'
     btnApply   = 'Appliquer'
     btnApplyNow= 'Appliquer et exécuter maintenant'
+    btnSnapNow = 'Créer un instantané maintenant'
+    snapHint   = 'Crée immédiatement un point de restauration, indépendamment de la planification. Les réglages ci-dessous restent inchangés.'
+    tipSnapNow = 'Exécute PITRTask une fois, même pendant l''utilisation de la machine. Rien n''est écrit dans la configuration.'
     grpLog     = 'Journal'
 
     effective  = 'Actuellement appliqué'
@@ -472,7 +481,7 @@ es = @{
     tsDisabled = 'desactivada'
     tsOverdue  = 'retrasada'
     missedRuns = 'ejecuciones omitidas: {0}'
-    noteIdle   = 'Los puntos de restauración solo se crean cuando el sistema está inactivo. Si el equipo se está usando o está apagado, la ejecución se aplaza — y una cita programada puede omitirse por completo. Por eso la frecuencia configurada es el intervalo mínimo posible, no una garantía. Con «Aplicar y ejecutar ahora» se puede forzar un punto en cualquier momento.'
+    noteIdle   = 'Los puntos de restauración solo se crean cuando el sistema está inactivo. Si el equipo se está usando o está apagado, la ejecución se aplaza — y una cita programada puede omitirse por completo. Por eso la frecuencia configurada es el intervalo mínimo posible, no una garantía. Con «Crear instantánea ahora», arriba del todo, se puede forzar un punto en cualquier momento.'
 
     grpPoints  = 'Puntos de restauración'
     lblCount   = 'Cantidad'
@@ -517,6 +526,9 @@ es = @{
     btnRefresh = 'Actualizar'
     btnApply   = 'Aplicar'
     btnApplyNow= 'Aplicar y ejecutar ahora'
+    btnSnapNow = 'Crear instantánea ahora'
+    snapHint   = 'Crea de inmediato un punto de restauración, al margen de la programación. Los ajustes de abajo quedan intactos.'
+    tipSnapNow = 'Ejecuta PITRTask una vez, incluso mientras el equipo está en uso. No se escribe nada en la configuración.'
     grpLog     = 'Registro'
 
     effective  = 'Actualmente en vigor'
@@ -576,7 +588,7 @@ pt = @{
     tsDisabled = 'desativada'
     tsOverdue  = 'atrasada em'
     missedRuns = 'execuções perdidas: {0}'
-    noteIdle   = 'Os pontos de restauração só são criados quando o sistema está ocioso. Se o computador estiver em uso ou desligado, a execução é adiada — e um horário agendado pode ser pulado por completo. Por isso a frequência configurada é um intervalo mínimo, não uma garantia. "Aplicar e executar agora" força um ponto a qualquer momento.'
+    noteIdle   = 'Os pontos de restauração só são criados quando o sistema está ocioso. Se o computador estiver em uso ou desligado, a execução é adiada — e um horário agendado pode ser pulado por completo. Por isso a frequência configurada é um intervalo mínimo, não uma garantia. "Criar instantâneo agora", no topo, força um ponto a qualquer momento.'
 
     grpPoints  = 'Pontos de restauração'
     lblCount   = 'Quantidade'
@@ -621,6 +633,9 @@ pt = @{
     btnRefresh = 'Atualizar'
     btnApply   = 'Aplicar'
     btnApplyNow= 'Aplicar e executar agora'
+    btnSnapNow = 'Criar instantâneo agora'
+    snapHint   = 'Cria imediatamente um ponto de restauração, independentemente do agendamento. As configurações abaixo permanecem intactas.'
+    tipSnapNow = 'Executa a PITRTask uma vez, mesmo com o computador em uso. Nada é gravado na configuração.'
     grpLog     = 'Registro'
 
     effective  = 'Atualmente em vigor'
@@ -815,6 +830,36 @@ $xaml = @'
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize" Background="#F5F5F5"
         FontFamily="Segoe UI" FontSize="13">
+  <Window.Resources>
+    <!-- Ein normaler WPF-Knopf nimmt zwar ein Background an, malt beim Ueberfahren aber
+         wieder den Systemverlauf darueber. Fuer den einen hervorgehobenen Knopf deshalb
+         eine eigene Vorlage; drei Zustaende genuegen ihm. -->
+    <Style x:Key="Primary" TargetType="Button">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Background" Value="#2C7A4B"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Chrome" Background="{TemplateBinding Background}"
+                    CornerRadius="3" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Chrome" Property="Background" Value="#35935A"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Chrome" Property="Background" Value="#215C39"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="Chrome" Property="Background" Value="#A9C4B4"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
   <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Margin="14">
 
@@ -844,6 +889,25 @@ $xaml = @'
         <Button x:Name="BtnLangPT" Tag="pt" Content="PT" Width="38" Height="26"/>
       </StackPanel>
     </Grid>
+
+    <!-- Der Schnappschuss steht bewusst oben und nicht bei den uebrigen Knoepfen am
+         Fuss: Er ist die einzige Aktion, die ohne jede Einstellung auskommt, und fuer
+         viele der einzige Grund, das Werkzeug ueberhaupt zu oeffnen. Die Erklaerung
+         daneben statt darunter, damit die Zeile keine zusaetzliche Hoehe kostet. -->
+    <Border Background="#EDF6F0" BorderBrush="#BFDCC9" BorderThickness="1"
+            Padding="9,7" Margin="0,0,0,10">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="BtnSnapNow" Grid.Column="0" Style="{StaticResource Primary}"
+                Height="34" MinWidth="240" Padding="14,0" FontSize="14" FontWeight="SemiBold"/>
+        <TextBlock x:Name="TxtSnapHint" Grid.Column="1" Margin="12,0,0,0"
+                   VerticalAlignment="Center" TextWrapping="Wrap"
+                   Foreground="#2F5744" FontSize="12"/>
+      </Grid>
+    </Border>
 
     <!-- Einleitung und Hinweis stehen bewusst ausserhalb des Rasters: in der linken Spalte
          brachen sie neben den Sprachknoepfen frueh um und liessen die Flaeche darunter leer.
@@ -971,6 +1035,7 @@ foreach ($n in 'TxtHead','TxtSub','TxtIntro','TxtUnofficial',
                'LnkProject','LnkGuide','RunGuide',
                'TxtUpdate','LnkUpdate','RunUpdate',
                'BtnLangEN','BtnLangDE','BtnLangFR','BtnLangES','BtnLangPT',
+               'BtnSnapNow','TxtSnapHint',
                'GrpState','CapEdition','TxtEdition','CapLast','TxtLast','CapNext','TxtNext',
                'CapTaskState','TxtTaskState','CapDelta','TxtDelta','TxtIdleNote',
                'GrpPoints','TxtPoints','TxtOldest','TxtStorage','TxtStoreNote','LstPoints',
@@ -1106,6 +1171,9 @@ function Apply-Language {
     $ctl.RunGuide.Text       = T 'lnkGuide'
     $ctl.LnkProject.ToolTip  = T 'tipProject'
     $ctl.LnkGuide.ToolTip    = T 'tipGuide'
+    $ctl.BtnSnapNow.Content  = T 'btnSnapNow'
+    $ctl.BtnSnapNow.ToolTip  = T 'tipSnapNow'
+    $ctl.TxtSnapHint.Text    = T 'snapHint'
 
     # The notice may already be on screen when the language is switched.
     if ($script:UpdateVersion) {
@@ -1378,7 +1446,7 @@ function Invoke-TaskNow {
 
 function Set-Busy {
     param([bool]$On)
-    $buttons = @('BtnReset','BtnRefresh','BtnApply','BtnApplyNow') +
+    $buttons = @('BtnSnapNow','BtnReset','BtnRefresh','BtnApply','BtnApplyNow') +
                @($LangCodes | ForEach-Object { 'BtnLang' + $_.ToUpper() })
     foreach ($b in $buttons) { $ctl[$b].IsEnabled = -not $On }
     $window.Cursor = if ($On) { [System.Windows.Input.Cursors]::Wait } else { $null }
@@ -1415,6 +1483,16 @@ $ctl.LnkGuide.Add_Click({
 $ctl.LnkUpdate.Add_Click({
     try { if ($script:UpdateUrl) { Start-Process $script:UpdateUrl } }
     catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
+})
+
+# Bewusst ohne Save-Settings: Der Knopf soll einen Punkt erzeugen und sonst nichts.
+# Wer die Einstellungen mit uebernehmen will, hat dafuer unten "Uebernehmen und sofort
+# ausfuehren"; die Trennung macht den Schnappschuss zur folgenlosen Aktion.
+$ctl.BtnSnapNow.Add_Click({
+    Set-Busy $true
+    try { Invoke-TaskNow; Update-View }
+    catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
+    finally { Set-Busy $false }
 })
 
 $ctl.BtnRefresh.Add_Click({
@@ -1509,6 +1587,7 @@ if ($SelfTest) {
         Write-Host "  Naechster    : $($ctl.TxtNext.Text)"
         Write-Host "  Gruppen      : $($ctl.GrpState.Header) | $($ctl.GrpPoints.Header) | $($ctl.GrpSet.Header) | $($ctl.GrpLog.Header)"
         Write-Host "  Spalten      : $(($ctl.LstPoints.View.Columns | ForEach-Object { $_.Header }) -join ' | ')"
+        Write-Host "  Schnappschuss: $($ctl.BtnSnapNow.Content) - $($ctl.TxtSnapHint.Text)"
         Write-Host "  Knoepfe      : $($ctl.BtnReset.Content) | $($ctl.BtnRefresh.Content) | $($ctl.BtnApply.Content) | $($ctl.BtnApplyNow.Content)"
         Write-Host "  $($ctl.TxtPoints.Text)"
         Write-Host "  $($ctl.TxtOldest.Text)"

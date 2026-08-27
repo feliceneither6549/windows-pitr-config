@@ -4,6 +4,24 @@ Notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] — 2026-08-27
+
+### Added
+
+- **Create snapshot now** — a highlighted button at the top of the window that creates a
+  restore point immediately, without writing any setting. The tool could already force a
+  point, but only through *Apply and run now* at the bottom, which saves the settings along
+  with it; creating a snapshot on demand is the more common reason to open the tool at all
+  and now has its own button.
+- The guide covers it in all five languages, with its own section and a row in the button
+  table.
+
+### Changed
+
+- The note about idle time now points at the new button as the way to force a point.
+- The German interface used a mixed pair of quotation marks in the unofficial-approach
+  notice.
+
 ## [1.3.1] — 2026-08-27
 
 ### Changed

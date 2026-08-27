@@ -10,6 +10,17 @@ retention settings that Microsoft exposes on the Enterprise edition only.
 A single, self-contained `.cmd` file with a graphical interface. No installation, no
 dependencies, no PowerShell modules. Copy it to a USB stick and run it anywhere.
 
+> ### 📸 A restore point on demand
+>
+> Beyond the schedule, the tool creates a **restore point at any moment**. The green
+> **Create snapshot now** button sits at the top of the window and needs nothing else — no
+> setting is changed, no value written. One click before a driver installation, a registry
+> edit, or the first run of unfamiliar software.
+>
+> This works even while the machine is in use, which a manual start of the task does not:
+> `PITRTask` runs only when the system is idle, so the button lifts that condition for
+> exactly one run and restores it afterwards.
+
 The interface speaks **English, German, French, Spanish and Portuguese**. It starts in
 whichever one matches your Windows display language; the buttons in the top right switch at
 any time. The window also links to the project and to the
@@ -17,7 +28,7 @@ any time. The window also links to the project and to the
 language you are currently using.
 
 ![The tool running on Windows 11 Pro: current state, existing restore points, and the four
-settings](docs/screenshot.png?v=1.3.1)
+settings](docs/screenshot.png?v=1.4.0)
 <!-- The ?v= is a cache buster. GitHub proxies README images and caches them by URL,
      so replacing the file alone keeps serving the old picture for a long time.
      Bump this whenever the screenshot is regenerated. -->
@@ -67,7 +78,8 @@ Every setting also offers **"Windows default"**, which removes the override agai
 >
 > The tool makes this visible rather than leaving you guessing: it shows the task status
 > (*waiting for the system to go idle* when a run is pending) and marks an overdue next run.
-> **Apply and run now** forces a point immediately whenever you want one.
+> **Create snapshot now**, at the top of the window, forces a point immediately whenever
+> one is wanted.
 
 ## Scope: the OS volume only
 
@@ -171,6 +183,7 @@ Get-FileHash pitr-config.cmd -Algorithm SHA256
 
 | Button | Effect |
 |---|---|
+| **Create snapshot now** | Creates a restore point immediately, without changing a single setting. Highlighted at the top of the window. |
 | **Apply** | Writes the values. A new frequency takes effect on the next task run. |
 | **Apply and run now** | Writes the values and runs the task immediately, so the schedule is recalculated at once. |
 | **Refresh** | Re-reads the current state. |
@@ -201,12 +214,18 @@ pitr-config.cmd noupdate
 This is the only network connection the tool makes. The request reveals nothing about your
 system beyond what any web request does — an IP address and a `pitr-config` user agent.
 
-### Why "Apply and run now" exists
+### How the snapshot on demand works
 
-`PITRTask` has `RunOnlyIfIdle = True`. While you are actively using the machine it stays in
-the *Queued* state and a manual start appears to do nothing. That button lifts the idle
-condition for exactly one run and restores it afterwards — including when an error occurs
-in between.
+`PITRTask` has `RunOnlyIfIdle = True`. While the machine is actively in use the task stays in
+the *Queued* state, and a manual start — from the Task Scheduler, or via `Start-ScheduledTask`
+— appears to do nothing at all. That is the reason a snapshot on demand needs a tool rather
+than a one-line command.
+
+**Create snapshot now** lifts the idle condition for exactly one run and restores it
+afterwards, including when an error occurs in between. It writes nothing else: the settings in
+the window are left where they are. **Apply and run now**, at the bottom, does the same thing
+but saves the settings first — the right button when a new frequency should take effect at
+once instead of at the next scheduled run.
 
 ## Requirements
 
