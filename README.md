@@ -69,18 +69,8 @@ Point-in-time restore covers the Windows volume — `C:` on a normal installatio
 nothing else. Other partitions and other disks are not included, **not even when they sit on
 the same physical disk**.
 
-That is not a setting anywhere; it is how the engine is built. `PITR.dll` carries an
-explicit rejection for anything else, and a snapshot's registry entry has no volume field at
-all, because there is only ever one volume:
-
-```
-OS volume      : %s
-Snapshot is not on the OS volume
-```
-
-Confirmed on a machine whose `C:` (230 GB) and `D:` (722 GB) are two partitions of the same
-SSD: `C:` holds the shadow copy and its difference area, while `D:` has no shadow copy and no
-shadow storage configured at all.
+That is not a setting anywhere; it is how the engine is built — see
+[Evidence](#evidence).
 
 Two consequences worth knowing:
 
@@ -123,6 +113,8 @@ These value names are **not documented by Microsoft**. They were recovered from
 
 ## Evidence
 
+### The frequency really does change
+
 Restore points are created by the scheduled task `\Microsoft\Windows\Setup\PITRTask`, which
 recalculates its next run time on every execution. The gap between last and next run is
 therefore a directly measurable indicator of the effective frequency.
@@ -136,6 +128,20 @@ Setting `SnapshotInterval_GPO = 240` and running the task once:
 Task exit code `0`, and an additional restore point was created. Afterwards the Settings app
 displayed *"Some of these settings are managed by your organization"* and showed the values
 greyed out — on a machine under no management at all.
+
+### Only the OS volume is ever covered
+
+`PITR.dll` carries an explicit rejection for anything else, and a snapshot's registry entry
+has no volume field at all, because there is only ever one volume:
+
+```
+OS volume      : %s
+Snapshot is not on the OS volume
+```
+
+Confirmed on a machine whose `C:` and `D:` are two partitions of the same SSD: `C:` holds the
+shadow copy and its difference area, while `D:` has no shadow copy and no shadow storage
+configured at all.
 
 ## Usage
 
