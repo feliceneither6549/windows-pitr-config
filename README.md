@@ -17,7 +17,10 @@ any time. The window also links to the project and to the
 language you are currently using.
 
 ![The tool running on Windows 11 Pro: current state, existing restore points, and the four
-settings](docs/screenshot.png)
+settings](docs/screenshot.png?v=1.3.0)
+<!-- The ?v= is a cache buster. GitHub proxies README images and caches them by URL,
+     so replacing the file alone keeps serving the old picture for a long time.
+     Bump this whenever the screenshot is regenerated. -->
 
 > **This is an unofficial approach.** The configuration values it writes are undocumented by
 > Microsoft; they were recovered by analysing the Windows binaries. A future Windows release
