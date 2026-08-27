@@ -170,6 +170,25 @@ For a read-only look at your system — no window, no administrator rights, noth
 pitr-config.cmd selftest
 ```
 
+### Update check
+
+On start the tool asks GitHub whether a newer release exists and, if so, shows a line in the
+window with a link to it. It never downloads or installs anything by itself — the link opens
+the release page in your browser and you decide from there. That is deliberate: a tool that
+writes to `HKLM` has no business replacing its own code over the network, and doing so would
+make the published checksums pointless.
+
+The check runs in the background, so the window stays usable, and it fails silently. No
+network, a firewall, or GitHub's rate limit simply means no notice appears. To skip it
+entirely, start the tool as:
+
+```
+pitr-config.cmd noupdate
+```
+
+This is the only network connection the tool makes. The request reveals nothing about your
+system beyond what any web request does — an IP address and a `pitr-config` user agent.
+
 ### Why "Apply and run now" exists
 
 `PITRTask` has `RunOnlyIfIdle = True`. While you are actively using the machine it stays in

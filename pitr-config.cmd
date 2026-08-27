@@ -13,6 +13,8 @@ rem
 rem  Running it with the argument "selftest" only checks the interface - no
 rem  window, no administrator rights, and nothing is written.
 rem
+rem  The argument "noupdate" skips the check for a newer version on start.
+rem
 rem  IMPORTANT: this file must stay UTF-8 WITHOUT BOM. A BOM makes cmd.exe
 rem  trip over the very first line. Non-ASCII characters in the PowerShell
 rem  part survive regardless, because the loader reads the file as UTF-8
@@ -22,9 +24,18 @@ setlocal
 
 if /i "%~1"=="selftest" goto :selftest
 
+rem  The argument has to survive the elevation, because the elevated instance is a new
+rem  process that does not inherit it. It is therefore passed on explicitly.
+set "PITR_NOUPDATE="
+if /i "%~1"=="noupdate" set "PITR_NOUPDATE=1"
+
 net session >nul 2>&1
 if "%errorlevel%"=="0" goto :admin
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs -WindowStyle Hidden"
+if defined PITR_NOUPDATE (
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs -WindowStyle Hidden -ArgumentList 'noupdate'"
+) else (
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath '%~f0' -Verb RunAs -WindowStyle Hidden"
+)
 exit /b
 
 :admin
@@ -69,7 +80,12 @@ $ErrorActionPreference = 'Stop'
 # The one place the version is defined. It appears under the headline in the window
 # and in the selftest; a release is tagged with "v" followed by this value. Keeping
 # it out of the batch header above avoids having two numbers that can drift apart.
-$Version  = '1.1.0'
+$Version  = '1.2.0'
+
+# Asked on start unless PITR_NOUPDATE is set. Returns the newest release of the project.
+$UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases/latest'
+$script:UpdateVersion = $null
+$script:UpdateUrl     = $null
 
 # Linked from the window. The guide carries all five languages in one page and picks
 # one from the fragment. A copy of it sitting next to the .cmd wins over the online
@@ -123,6 +139,8 @@ en = @{
     lnkGuide   = 'Guide'
     tipProject = 'Open the project page on GitHub'
     tipGuide   = 'Open the short guide in your browser'
+    updAvail   = 'Version {0} is available - open the release page'
+    tipUpdate  = 'Opens the download page in your browser. Nothing is downloaded or installed automatically.'
 
     grpState   = 'Current state'
     capEdition = 'Windows edition:'
@@ -226,6 +244,8 @@ de = @{
     lnkGuide   = 'Anleitung'
     tipProject = 'Projektseite auf GitHub öffnen'
     tipGuide   = 'Kurzanleitung im Browser öffnen'
+    updAvail   = 'Version {0} ist verfügbar - Release-Seite öffnen'
+    tipUpdate  = 'Öffnet die Download-Seite im Browser. Es wird nichts automatisch heruntergeladen oder installiert.'
 
     grpState   = 'Aktueller Zustand'
     capEdition = 'Windows-Edition:'
@@ -331,6 +351,8 @@ fr = @{
     lnkGuide   = 'Guide'
     tipProject = 'Ouvrir la page du projet sur GitHub'
     tipGuide   = 'Ouvrir le guide rapide dans le navigateur'
+    updAvail   = 'La version {0} est disponible - ouvrir la page de la version'
+    tipUpdate  = 'Ouvre la page de téléchargement dans le navigateur. Rien n''est téléchargé ni installé automatiquement.'
 
     grpState   = 'État actuel'
     capEdition = 'Édition de Windows :'
@@ -432,6 +454,8 @@ es = @{
     lnkGuide   = 'Guía'
     tipProject = 'Abrir la página del proyecto en GitHub'
     tipGuide   = 'Abrir la guía breve en el navegador'
+    updAvail   = 'La versión {0} está disponible - abrir la página de la versión'
+    tipUpdate  = 'Abre la página de descarga en el navegador. No se descarga ni se instala nada automáticamente.'
 
     grpState   = 'Estado actual'
     capEdition = 'Edición de Windows:'
@@ -533,6 +557,8 @@ pt = @{
     lnkGuide   = 'Guia'
     tipProject = 'Abrir a página do projeto no GitHub'
     tipGuide   = 'Abrir o guia rápido no navegador'
+    updAvail   = 'A versão {0} está disponível - abrir a página da versão'
+    tipUpdate  = 'Abre a página de download no navegador. Nada é baixado nem instalado automaticamente.'
 
     grpState   = 'Estado atual'
     capEdition = 'Edição do Windows:'
@@ -788,6 +814,9 @@ $xaml = @'
           <Run Text="   ·   " Foreground="#AAAAAA"/>
           <Hyperlink x:Name="LnkGuide"><Run x:Name="RunGuide" Text="Guide"/></Hyperlink>
         </TextBlock>
+        <TextBlock x:Name="TxtUpdate" FontSize="12" Margin="0,5,0,0" Visibility="Collapsed">
+          <Hyperlink x:Name="LnkUpdate" Foreground="#1A7F37" FontWeight="SemiBold"><Run x:Name="RunUpdate" Text=""/></Hyperlink>
+        </TextBlock>
         <TextBlock x:Name="TxtIntro" Foreground="#555" TextWrapping="Wrap" Margin="0,6,0,0"/>
         <Border BorderBrush="#D9B36A" BorderThickness="1" Background="#FFF8E7"
                 Padding="9,7" Margin="0,10,0,0">
@@ -912,6 +941,7 @@ $window = [System.Windows.Markup.XamlReader]::Load($reader)
 $ctl = @{}
 foreach ($n in 'TxtHead','TxtSub','TxtIntro','TxtUnofficial',
                'LnkProject','LnkGuide','RunGuide',
+               'TxtUpdate','LnkUpdate','RunUpdate',
                'BtnLangEN','BtnLangDE','BtnLangFR','BtnLangES','BtnLangPT',
                'GrpState','CapEdition','TxtEdition','CapLast','TxtLast','CapNext','TxtNext',
                'CapTaskState','TxtTaskState','CapDelta','TxtDelta','TxtIdleNote',
@@ -926,6 +956,45 @@ foreach ($n in 'TxtHead','TxtSub','TxtIntro','TxtUnofficial',
 # Marks the active language button. Built once - a brush per repaint would be wasteful.
 $BrushActiveLang = New-Object System.Windows.Media.SolidColorBrush (
     [System.Windows.Media.ColorConverter]::ConvertFromString('#CFE3F7'))
+
+# The check runs in its own runspace, because a hanging proxy on the UI thread would
+# freeze the window for the length of the timeout. Every failure stays silent - no network,
+# a firewall, GitHub down, the rate limit reached: the tool then behaves exactly as it did
+# before. An update notice is never worth an error message.
+#
+# Deliberately no automatic download and no self-replacement. This tool writes to HKLM;
+# something in that position quietly replacing its own code from the internet is precisely
+# the shape people are warned about, and it would make the published checksums pointless.
+function Start-UpdateCheck {
+    if ($env:PITR_NOUPDATE) { return $null }
+    try {
+        $ps = [PowerShell]::Create()
+        $ps.AddScript({
+            param($Url)
+            try {
+                [Net.ServicePointManager]::SecurityProtocol =
+                    [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+                $r = Invoke-RestMethod -Uri $Url -Headers @{ 'User-Agent' = 'pitr-config' } -TimeoutSec 3
+                [pscustomobject]@{ Tag = [string]$r.tag_name; Url = [string]$r.html_url }
+            } catch { $null }
+        }).AddArgument($UpdateApi) | Out-Null
+        return [pscustomobject]@{ Shell = $ps; Handle = $ps.BeginInvoke() }
+    } catch { return $null }
+}
+
+function Show-UpdateNotice {
+    param($Info)
+    if (-not $Info -or -not $Info.Tag) { return }
+    $new = ([string]$Info.Tag).TrimStart('vV')
+    $newer = $false
+    try { $newer = [version]$new -gt [version]$Version } catch { }
+    if (-not $newer) { return }
+    $script:UpdateVersion = $new
+    $script:UpdateUrl     = [string]$Info.Url
+    $ctl.RunUpdate.Text   = (T 'updAvail') -f $new
+    $ctl.LnkUpdate.ToolTip = T 'tipUpdate'
+    $ctl.TxtUpdate.Visibility = 'Visible'
+}
 
 # ---------------------------------------------------------------- Helpers --
 function Write-Log {
@@ -1009,6 +1078,12 @@ function Apply-Language {
     $ctl.RunGuide.Text       = T 'lnkGuide'
     $ctl.LnkProject.ToolTip  = T 'tipProject'
     $ctl.LnkGuide.ToolTip    = T 'tipGuide'
+
+    # The notice may already be on screen when the language is switched.
+    if ($script:UpdateVersion) {
+        $ctl.RunUpdate.Text    = (T 'updAvail') -f $script:UpdateVersion
+        $ctl.LnkUpdate.ToolTip = T 'tipUpdate'
+    }
 
     # The active language is marked, not disabled: IsEnabled belongs to Set-Busy, which
     # would otherwise switch it back on and lose the marking.
@@ -1277,6 +1352,11 @@ $ctl.LnkGuide.Add_Click({
     catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
 })
 
+$ctl.LnkUpdate.Add_Click({
+    try { if ($script:UpdateUrl) { Start-Process $script:UpdateUrl } }
+    catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
+})
+
 $ctl.BtnRefresh.Add_Click({
     try { Update-View; Write-Log (T 'logRefresh') }
     catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
@@ -1333,6 +1413,7 @@ if ($SelfTest) {
         }
         Write-Host "  Sprachknoepfe: $($lb -join ' ')"
         Write-Host "  Anleitung    : $($ctl.RunGuide.Text) -> $(Get-GuideUri)"
+        Write-Host "  Update-Text  : $((T 'updAvail') -f '9.9.9')"
         Write-Host "  Hinweisbox   : $($ctl.TxtUnofficial.Text)"
         Write-Host "  Leerlauf-Box : $($ctl.TxtIdleNote.Text)"
         Write-Host "  Laufwerk-Box : $($ctl.TxtVolumeNote.Text)"
@@ -1359,4 +1440,28 @@ if ($SelfTest) {
 
 if (-not (Test-Admin)) { Write-Log (T 'logNoAdmin') }
 Write-Log (T 'logReady')
+
+# Polled from the UI thread instead of using a completion callback, because a callback
+# fires on the worker thread and may not touch WPF controls from there.
+$script:UpdateJob = Start-UpdateCheck
+if ($script:UpdateJob) {
+    $script:UpdateTries = 0
+    $script:UpdateTimer = New-Object System.Windows.Threading.DispatcherTimer
+    $script:UpdateTimer.Interval = [TimeSpan]::FromMilliseconds(400)
+    $script:UpdateTimer.Add_Tick({
+        $script:UpdateTries++
+        $j = $script:UpdateJob
+        if ($j.Handle.IsCompleted) {
+            $script:UpdateTimer.Stop()
+            try { Show-UpdateNotice (@($j.Shell.EndInvoke($j.Handle)))[0] } catch { }
+            try { $j.Shell.Dispose() } catch { }
+        } elseif ($script:UpdateTries -ge 20) {
+            # Roughly eight seconds - after that nobody is waiting for the answer any more.
+            $script:UpdateTimer.Stop()
+            try { $j.Shell.Stop(); $j.Shell.Dispose() } catch { }
+        }
+    })
+    $script:UpdateTimer.Start()
+}
+
 $window.ShowDialog() | Out-Null

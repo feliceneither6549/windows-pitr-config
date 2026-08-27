@@ -4,6 +4,26 @@ Notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-08-27
+
+### Added
+
+- A check for a newer release on start. When one exists, the window shows a line with a link
+  to the release page, in whichever language is selected. The check runs in a background
+  runspace so the window stays responsive, and it fails silently — no network, a firewall or
+  GitHub's rate limit simply means no notice appears.
+- `pitr-config.cmd noupdate` skips that check. The argument is passed on across the elevation
+  prompt, which starts a new process that would otherwise lose it.
+
+### Notes
+
+- Nothing is downloaded or installed automatically, by design. A tool that writes to `HKLM`
+  should not replace its own code over the network, and doing so would make the published
+  checksums pointless. The notice is a link; the decision stays with the user.
+- The update check is the only network connection the tool makes. The request reveals nothing
+  about the system beyond what any web request does — an IP address and a `pitr-config` user
+  agent.
+
 ## [1.1.0] — 2026-08-27
 
 ### Added
