@@ -4,6 +4,35 @@ Notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] — 2026-08-27
+
+### Fixed
+
+- The scheduled interval was computed as *next run minus last run*, which is only the
+  configured interval when no run is ever skipped. Since the task runs only while the system
+  is idle, skipped runs are the normal case — an hourly schedule then showed up as two hours,
+  with a misleading note claiming the value stemmed from a previous setting. The interval is
+  now read from the repetition of the task's time trigger, where it actually lives.
+
+### Added
+
+- Skipped runs are shown next to the task status. They are what explains a gap between two
+  restore points that is longer than the configured interval.
+
+### Changed
+
+- The window is no longer a fixed 880 pixels tall. It opens at 800 at most, and never taller
+  than the work area minus a margin — the work area excludes the taskbar, so the window can
+  no longer end up behind it. On a tall screen it grows beyond 800 if that lets the content
+  fit without scrolling, and it is re-centred on the work area afterwards.
+- The introduction and the "unofficial approach" notice now run the full width of the window.
+  They used to sit in the left column next to the language buttons, where they wrapped early
+  and left the area beneath the buttons empty.
+- The scheduled interval and the task status swapped places, and the restore point count now
+  shares a line with the oldest point.
+- Paddings, margins, the restore point list and the log box were tightened throughout. The
+  same content now needs roughly 200 pixels less height.
+
 ## [1.2.1] — 2026-08-27
 
 ### Fixed

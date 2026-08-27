@@ -80,7 +80,7 @@ $ErrorActionPreference = 'Stop'
 # The one place the version is defined. It appears under the headline in the window
 # and in the selftest; a release is tagged with "v" followed by this value. Keeping
 # it out of the batch header above avoids having two numbers that can drift apart.
-$Version  = '1.2.1'
+$Version  = '1.3.0'
 
 # Asked on start unless PITR_NOUPDATE is set. Returns the newest release of the project.
 $UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases/latest'
@@ -153,6 +153,7 @@ en = @{
     tsRunning  = 'running right now'
     tsDisabled = 'disabled'
     tsOverdue  = 'overdue by'
+    missedRuns = 'runs skipped: {0}'
     noteIdle   = 'Restore points are only created while the system is idle. If the machine is in use or switched off, the run is postponed - and a scheduled slot may be skipped entirely. The configured frequency is therefore an earliest possible interval, not a guarantee. Use "Apply and run now" to force a point at any time.'
 
     grpPoints  = 'Restore points'
@@ -258,6 +259,7 @@ de = @{
     tsRunning  = 'läuft gerade'
     tsDisabled = 'deaktiviert'
     tsOverdue  = 'überfällig seit'
+    missedRuns = 'ausgefallene Läufe: {0}'
     noteIdle   = 'Wiederherstellungspunkte entstehen nur, wenn das System im Leerlauf ist. Wird der Rechner gerade benutzt oder ist er ausgeschaltet, verschiebt sich der Lauf — ein Termin kann dadurch auch ganz ausfallen. Die eingestellte Häufigkeit ist deshalb ein frühestmöglicher Abstand, keine Garantie. Mit „Übernehmen und sofort ausführen" lässt sich jederzeit ein Punkt erzwingen.'
 
     grpPoints  = 'Wiederherstellungspunkte'
@@ -365,6 +367,7 @@ fr = @{
     tsRunning  = 'en cours d''exécution'
     tsDisabled = 'désactivée'
     tsOverdue  = 'en retard de'
+    missedRuns = 'exécutions manquées : {0}'
     noteIdle   = 'Les points de restauration ne sont créés que lorsque le système est inactif. Si la machine est utilisée ou éteinte, l''exécution est reportée — et un créneau planifié peut être ignoré entièrement. La fréquence configurée est donc un intervalle minimal, pas une garantie. « Appliquer et exécuter maintenant » force un point à tout moment.'
 
     grpPoints  = 'Points de restauration'
@@ -468,6 +471,7 @@ es = @{
     tsRunning  = 'en ejecución'
     tsDisabled = 'desactivada'
     tsOverdue  = 'retrasada'
+    missedRuns = 'ejecuciones omitidas: {0}'
     noteIdle   = 'Los puntos de restauración solo se crean cuando el sistema está inactivo. Si el equipo se está usando o está apagado, la ejecución se aplaza — y una cita programada puede omitirse por completo. Por eso la frecuencia configurada es el intervalo mínimo posible, no una garantía. Con «Aplicar y ejecutar ahora» puede forzar un punto en cualquier momento.'
 
     grpPoints  = 'Puntos de restauración'
@@ -571,6 +575,7 @@ pt = @{
     tsRunning  = 'em execução'
     tsDisabled = 'desativada'
     tsOverdue  = 'atrasada em'
+    missedRuns = 'execuções perdidas: {0}'
     noteIdle   = 'Os pontos de restauração só são criados quando o sistema está ocioso. Se o computador estiver em uso ou desligado, a execução é adiada — e um horário agendado pode ser pulado por completo. Por isso a frequência configurada é um intervalo mínimo, não uma garantia. Use "Aplicar e executar agora" para forçar um ponto a qualquer momento.'
 
     grpPoints  = 'Pontos de restauração'
@@ -796,34 +801,29 @@ function Get-ShadowStorage {
 $xaml = @'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Width="790" Height="880" MaxHeight="900" MinWidth="720" MinHeight="480"
+        Width="790" Height="800" MinWidth="720" MinHeight="440"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize" Background="#F5F5F5"
         FontFamily="Segoe UI" FontSize="13">
   <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="18">
+    <StackPanel Margin="14">
 
-    <Grid Margin="0,0,0,14">
+    <Grid Margin="0,0,0,8">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
       <StackPanel Grid.Column="0">
-        <TextBlock x:Name="TxtHead" FontSize="21" FontWeight="SemiBold"/>
+        <TextBlock x:Name="TxtHead" FontSize="20" FontWeight="SemiBold"/>
         <TextBlock x:Name="TxtSub" FontSize="13" Foreground="#777" Margin="0,1,0,0"/>
-        <TextBlock FontSize="12" Margin="0,4,0,0">
+        <TextBlock FontSize="12" Margin="0,3,0,0">
           <Hyperlink x:Name="LnkProject"><Run Text="github.com/henmedia/windows-pitr-config"/></Hyperlink>
           <Run Text="   ·   " Foreground="#AAAAAA"/>
           <Hyperlink x:Name="LnkGuide"><Run x:Name="RunGuide" Text="Guide"/></Hyperlink>
         </TextBlock>
-        <TextBlock x:Name="TxtUpdate" FontSize="12" Margin="0,5,0,0" Visibility="Collapsed">
+        <TextBlock x:Name="TxtUpdate" FontSize="12" Margin="0,4,0,0" Visibility="Collapsed">
           <Hyperlink x:Name="LnkUpdate" Foreground="#1A7F37" FontWeight="SemiBold"><Run x:Name="RunUpdate" Text=""/></Hyperlink>
         </TextBlock>
-        <TextBlock x:Name="TxtIntro" Foreground="#555" TextWrapping="Wrap" Margin="0,6,0,0"/>
-        <Border BorderBrush="#D9B36A" BorderThickness="1" Background="#FFF8E7"
-                Padding="9,7" Margin="0,10,0,0">
-          <TextBlock x:Name="TxtUnofficial" TextWrapping="Wrap" Foreground="#6B5210" FontSize="12"/>
-        </Border>
       </StackPanel>
       <StackPanel Grid.Column="1" Orientation="Horizontal"
                   VerticalAlignment="Top" Margin="12,2,0,0">
@@ -835,7 +835,16 @@ $xaml = @'
       </StackPanel>
     </Grid>
 
-    <GroupBox x:Name="GrpState" Padding="12" Margin="0,0,0,14">
+    <!-- Einleitung und Hinweis stehen bewusst ausserhalb des Rasters: in der linken Spalte
+         brachen sie neben den Sprachknoepfen frueh um und liessen die Flaeche darunter leer.
+         Ueber die volle Breite brauchen sie zugleich weniger Zeilen. -->
+    <TextBlock x:Name="TxtIntro" Foreground="#555" TextWrapping="Wrap" Margin="0,0,0,8"/>
+    <Border BorderBrush="#D9B36A" BorderThickness="1" Background="#FFF8E7"
+            Padding="8,6" Margin="0,0,0,10">
+      <TextBlock x:Name="TxtUnofficial" TextWrapping="Wrap" Foreground="#6B5210" FontSize="12"/>
+    </Border>
+
+    <GroupBox x:Name="GrpState" Padding="9" Margin="0,0,0,10">
       <StackPanel>
         <Grid>
           <Grid.ColumnDefinitions>
@@ -849,31 +858,38 @@ $xaml = @'
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
-          <TextBlock x:Name="CapEdition" Grid.Row="0" Grid.Column="0" Margin="0,0,10,4"/>
-          <TextBlock x:Name="TxtEdition" Grid.Row="0" Grid.Column="1" Text="-" Margin="0,0,0,4" TextWrapping="Wrap"/>
-          <TextBlock x:Name="CapLast" Grid.Row="1" Grid.Column="0" Margin="0,0,10,4"/>
-          <TextBlock x:Name="TxtLast" Grid.Row="1" Grid.Column="1" Text="-" Margin="0,0,0,4"/>
-          <TextBlock x:Name="CapNext" Grid.Row="2" Grid.Column="0" Margin="0,0,10,4"/>
-          <TextBlock x:Name="TxtNext" Grid.Row="2" Grid.Column="1" Text="-" Margin="0,0,0,4" TextWrapping="Wrap"/>
-          <TextBlock x:Name="CapTaskState" Grid.Row="3" Grid.Column="0" Margin="0,0,10,4"/>
-          <TextBlock x:Name="TxtTaskState" Grid.Row="3" Grid.Column="1" Text="-" Margin="0,0,0,4" TextWrapping="Wrap"/>
-          <TextBlock x:Name="CapDelta" Grid.Row="4" Grid.Column="0" Margin="0,0,10,0"/>
-          <TextBlock x:Name="TxtDelta" Grid.Row="4" Grid.Column="1" Text="-" TextWrapping="Wrap"/>
+          <TextBlock x:Name="CapEdition" Grid.Row="0" Grid.Column="0" Margin="0,0,10,2"/>
+          <TextBlock x:Name="TxtEdition" Grid.Row="0" Grid.Column="1" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
+          <TextBlock x:Name="CapLast" Grid.Row="1" Grid.Column="0" Margin="0,0,10,2"/>
+          <TextBlock x:Name="TxtLast" Grid.Row="1" Grid.Column="1" Text="-" Margin="0,0,0,2"/>
+          <TextBlock x:Name="CapNext" Grid.Row="2" Grid.Column="0" Margin="0,0,10,2"/>
+          <TextBlock x:Name="TxtNext" Grid.Row="2" Grid.Column="1" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
+          <TextBlock x:Name="CapDelta" Grid.Row="3" Grid.Column="0" Margin="0,0,10,2"/>
+          <TextBlock x:Name="TxtDelta" Grid.Row="3" Grid.Column="1" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
+          <TextBlock x:Name="CapTaskState" Grid.Row="4" Grid.Column="0" Margin="0,0,10,0"/>
+          <TextBlock x:Name="TxtTaskState" Grid.Row="4" Grid.Column="1" Text="-" TextWrapping="Wrap"/>
         </Grid>
         <Border BorderBrush="#C9D6E4" BorderThickness="1" Background="#EEF4FA"
-                Padding="9,7" Margin="0,10,0,0">
+                Padding="8,5" Margin="0,8,0,0">
           <TextBlock x:Name="TxtIdleNote" TextWrapping="Wrap" Foreground="#2C4A66" FontSize="12"/>
         </Border>
       </StackPanel>
     </GroupBox>
 
-    <GroupBox x:Name="GrpPoints" Padding="12" Margin="0,0,0,14">
+    <GroupBox x:Name="GrpPoints" Padding="9" Margin="0,0,0,10">
       <StackPanel>
-        <TextBlock x:Name="TxtPoints" Text="-" Margin="0,0,0,2"/>
-        <TextBlock x:Name="TxtOldest" Text="-" Margin="0,0,0,6" TextWrapping="Wrap"/>
+        <!-- WrapPanel statt einer festen Zeile: Anzahl und aeltester Punkt stehen
+             nebeneinander, rutschen aber um, wenn der 72-Stunden-Hinweis die Zeile
+             sprengt. Zwei Textblocks bleiben es, damit sich nur der hintere gruen
+             faerben kann. -->
+        <WrapPanel Orientation="Horizontal" Margin="0,0,0,4">
+          <TextBlock x:Name="TxtPoints" Text="-"/>
+          <TextBlock Text="  ·  " Foreground="#AAAAAA"/>
+          <TextBlock x:Name="TxtOldest" Text="-"/>
+        </WrapPanel>
         <TextBlock x:Name="TxtStorage" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
-        <TextBlock x:Name="TxtStoreNote" Foreground="#666" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"/>
-        <ListView x:Name="LstPoints" Height="150" BorderThickness="1" BorderBrush="#DDD"
+        <TextBlock x:Name="TxtStoreNote" Foreground="#666" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,6"/>
+        <ListView x:Name="LstPoints" Height="118" BorderThickness="1" BorderBrush="#DDD"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
           <ListView.View>
             <GridView>
@@ -885,49 +901,49 @@ $xaml = @'
           </ListView.View>
         </ListView>
         <Border BorderBrush="#C9D6E4" BorderThickness="1" Background="#EEF4FA"
-                Padding="9,7" Margin="0,10,0,0">
+                Padding="8,5" Margin="0,8,0,0">
           <TextBlock x:Name="TxtVolumeNote" TextWrapping="Wrap" Foreground="#2C4A66" FontSize="12"/>
         </Border>
       </StackPanel>
     </GroupBox>
 
-    <GroupBox x:Name="GrpSet" Padding="12" Margin="0,0,0,14">
+    <GroupBox x:Name="GrpSet" Padding="9" Margin="0,0,0,10">
       <StackPanel>
         <TextBlock x:Name="CapActive" FontWeight="SemiBold"/>
-        <ComboBox x:Name="CmbActive" Margin="0,4,0,2"/>
-        <TextBlock x:Name="LblActive" Foreground="#666" FontSize="11" Margin="0,0,0,12" TextWrapping="Wrap"/>
+        <ComboBox x:Name="CmbActive" Margin="0,3,0,2"/>
+        <TextBlock x:Name="LblActive" Foreground="#666" FontSize="11" Margin="0,0,0,8" TextWrapping="Wrap"/>
 
         <TextBlock x:Name="CapFreq" FontWeight="SemiBold"/>
-        <ComboBox x:Name="CmbFreq" Margin="0,4,0,2"/>
-        <TextBlock x:Name="LblFreq" Foreground="#666" FontSize="11" Margin="0,0,0,12" TextWrapping="Wrap"/>
+        <ComboBox x:Name="CmbFreq" Margin="0,3,0,2"/>
+        <TextBlock x:Name="LblFreq" Foreground="#666" FontSize="11" Margin="0,0,0,8" TextWrapping="Wrap"/>
 
         <TextBlock x:Name="CapReten" FontWeight="SemiBold"/>
-        <ComboBox x:Name="CmbReten" Margin="0,4,0,2"/>
-        <TextBlock x:Name="LblReten" Foreground="#666" FontSize="11" Margin="0,0,0,12" TextWrapping="Wrap"/>
+        <ComboBox x:Name="CmbReten" Margin="0,3,0,2"/>
+        <TextBlock x:Name="LblReten" Foreground="#666" FontSize="11" Margin="0,0,0,8" TextWrapping="Wrap"/>
 
         <TextBlock x:Name="CapSize" FontWeight="SemiBold"/>
-        <ComboBox x:Name="CmbSize" Margin="0,4,0,2"/>
+        <ComboBox x:Name="CmbSize" Margin="0,3,0,2"/>
         <TextBlock x:Name="LblSize" Foreground="#666" FontSize="11" TextWrapping="Wrap"/>
       </StackPanel>
     </GroupBox>
 
-    <Grid Margin="0,0,0,12">
+    <Grid Margin="0,0,0,10">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto"/>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
-      <Button x:Name="BtnReset" Grid.Column="0" Width="170" Height="34" HorizontalAlignment="Left"/>
+      <Button x:Name="BtnReset" Grid.Column="0" Width="170" Height="30" HorizontalAlignment="Left"/>
       <StackPanel Grid.Column="2" Orientation="Horizontal">
-        <Button x:Name="BtnRefresh"  Width="120" Height="34" Margin="0,0,8,0"/>
-        <Button x:Name="BtnApply"    Width="130" Height="34" Margin="0,0,8,0"/>
-        <Button x:Name="BtnApplyNow" Width="230" Height="34"/>
+        <Button x:Name="BtnRefresh"  Width="120" Height="30" Margin="0,0,8,0"/>
+        <Button x:Name="BtnApply"    Width="130" Height="30" Margin="0,0,8,0"/>
+        <Button x:Name="BtnApplyNow" Width="230" Height="30"/>
       </StackPanel>
     </Grid>
 
-    <GroupBox x:Name="GrpLog" Padding="8">
+    <GroupBox x:Name="GrpLog" Padding="6">
       <TextBox x:Name="TxtLog" IsReadOnly="True" TextWrapping="Wrap"
-               VerticalScrollBarVisibility="Auto" Height="110"
+               VerticalScrollBarVisibility="Auto" Height="76"
                BorderThickness="1" BorderBrush="#DDD" Background="White"
                Padding="6" FontFamily="Consolas" FontSize="12"/>
     </GroupBox>
@@ -1219,15 +1235,35 @@ function Update-View {
             default    { $ctl.TxtTaskState.Text = $stateName }
         }
 
-        if ($info.LastRunTime -and $info.NextRunTime) {
-            $d = [math]::Round(($info.NextRunTime - $info.LastRunTime).TotalMinutes)
-            $txt = "$d $(T 'unitMin') = $([math]::Round($d/60,1)) $(T 'unitHours')"
-            # PITRTask recalculates its next run only while running. If the scheduled
-            # interval differs from the configured frequency, it still stems from the
-            # previous setting - not a contradiction, just a carry-over.
-            # One minute of tolerance to absorb rounding of seconds.
+        # Ausgefallene Laeufe gehoeren neben den Status: Sie sind die Erklaerung dafuer,
+        # dass zwischen zwei Punkten mehr Zeit liegt als der eingeplante Abstand.
+        if ($info.NumberOfMissedRuns -gt 0) {
+            $ctl.TxtTaskState.Text += '  ·  ' + ((T 'missedRuns') -f $info.NumberOfMissedRuns)
+        }
+
+        # The scheduled interval is the repetition of the time trigger. Deriving it from
+        # "next run minus last run" was wrong: when a run is skipped because the machine is
+        # not idle - the normal case, and the very thing the note below explains - that gap
+        # grows to a multiple of the interval while the schedule itself is unchanged.
+        $planned = $null
+        foreach ($tr in $task.Triggers) {
+            if ($tr.Repetition -and $tr.Repetition.Interval) {
+                try {
+                    $planned = [System.Xml.XmlConvert]::ToTimeSpan([string]$tr.Repetition.Interval).TotalMinutes
+                    break
+                } catch { }
+            }
+        }
+
+        if ($null -ne $planned) {
+            $d = [math]::Round($planned)
+            # Format-Duration statt fester Pluralform: sonst steht dort "1 hours".
+            $txt = "$d $(T 'unitMin') = $(Format-Duration $d)"
+            # PITRTask rewrites its own trigger only while running, so right after a change
+            # the trigger can still carry the previous value - not a contradiction, just a
+            # carry-over. One minute of tolerance absorbs rounding of seconds.
             if ([math]::Abs($d - $effFreq) -gt 1) {
-                $txt += '  —  ' + (T 'carryOver') + " $([math]::Round($effFreq/60,1)) $(T 'unitHours')"
+                $txt += '  —  ' + (T 'carryOver') + ' ' + (Format-Duration $effFreq)
                 $ctl.TxtDelta.Foreground = [System.Windows.Media.Brushes]::DarkOrange
             } else {
                 $ctl.TxtDelta.Foreground = [System.Windows.Media.Brushes]::Black
@@ -1411,6 +1447,34 @@ $ctl.BtnReset.Add_Click({
 Apply-Language
 Update-View
 
+# Die Arbeitsflaeche ist der Bildschirm ohne Taskleiste - was hineinpasst, kann von ihr
+# nicht verdeckt werden. Davon geht noch eine Reserve ab, damit das Fenster nicht bündig an
+# den Kanten klebt. 800 Pixel sind die Obergrenze fuer den Normalfall; auf einem hohen
+# Bildschirm darf das Fenster darueber hinaus wachsen, aber nie ueber die Arbeitsflaeche.
+$workArea = [System.Windows.SystemParameters]::WorkArea
+$reserve  = 56
+$window.MaxHeight = [math]::Max(440, [math]::Floor($workArea.Height - $reserve))
+$window.Height    = [math]::Min($window.MaxHeight, 800)
+
+# Erst nach dem ersten Zeichnen steht fest, wie hoch der Inhalt tatsaechlich ist. Passt er
+# ohne Rollbalken und laesst der Bildschirm es zu, waechst das Fenster darauf.
+$window.Add_ContentRendered({
+    try {
+        $sv     = $window.Content
+        $panel  = $sv.Content
+        $chrome = $window.ActualHeight - $sv.ActualHeight
+        $need   = [math]::Ceiling($panel.ActualHeight + $chrome + 2)
+        $target = [math]::Min($window.MaxHeight, $need)
+        if ($target -gt $window.ActualHeight) { $window.Height = $target }
+
+        # Neu mittig setzen: CenterScreen zentriert auf dem Bildschirm, nicht auf der
+        # Arbeitsflaeche, und die Hoehe hat sich seitdem geaendert.
+        $wa = [System.Windows.SystemParameters]::WorkArea
+        $window.Top  = $wa.Top  + [math]::Max(0, ($wa.Height - $window.ActualHeight) / 2)
+        $window.Left = $wa.Left + [math]::Max(0, ($wa.Width  - $window.ActualWidth)  / 2)
+    } catch { }
+})
+
 if ($SelfTest) {
     foreach ($l in $LangCodes) {
         $script:Lang = $l
@@ -1419,7 +1483,7 @@ if ($SelfTest) {
         Write-Host "===== Sprache: $l ====="
         Write-Host "  Titel        : $($window.Title)"
         Write-Host "  Untertitel   : $($ctl.TxtSub.Text)"
-        Write-Host "  Hoehe/Max    : $($window.Height) / $($window.MaxHeight)"
+        Write-Host "  Hoehe/Max    : $($window.Height) / $($window.MaxHeight)  (Arbeitsflaeche $([int]([System.Windows.SystemParameters]::WorkArea.Height)))"
         $lb = foreach ($c in $LangCodes) {
             $n = 'BtnLang' + $c.ToUpper()
             if ($ctl[$n].FontWeight -eq [System.Windows.FontWeights]::Bold) { "[$($ctl[$n].Content)]" }
