@@ -80,7 +80,7 @@ $ErrorActionPreference = 'Stop'
 # The one place the version is defined. It appears under the headline in the window
 # and in the selftest; a release is tagged with "v" followed by this value. Keeping
 # it out of the batch header above avoids having two numbers that can drift apart.
-$Version  = '1.2.0'
+$Version  = '1.2.1'
 
 # Asked on start unless PITR_NOUPDATE is set. Returns the newest release of the project.
 $UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases/latest'
@@ -755,7 +755,9 @@ function Get-RestorePoints {
         $list.Add([pscustomobject]@{
             Sortier   = if ($dt) { $dt } else { [DateTime]::MinValue }
             AlterStd  = $ageH
-            Zeitpunkt = if ($dt) { $dt.ToString('dd.MM.yyyy  HH:mm') } else { T 'unknownTxt' }
+            # 'g' is the short date and time of the user's region. A fixed dd.MM.yyyy would be
+            # wrong everywhere outside the German-speaking world.
+            Zeitpunkt = if ($dt) { $dt.ToString('g') } else { T 'unknownTxt' }
             Alter     = if ($null -ne $ageH) { Format-Age $ageH } else { '-' }
             Status    = if (-not $vssOk) { T 'stUnknown' }
                         elseif ($vss.ContainsKey("$($p.Id)")) { T 'stShadowOk' }
@@ -1140,8 +1142,20 @@ function Update-View {
     $s = Get-PitrValue 'MaxGlobalSize'
     $effFreq = if ($null -eq $f) { 1440 } else { $f.Value }
 
+    # ProductName still reads "Windows 10 ..." on Windows 11 - Microsoft never updated the
+    # value, for application compatibility, so it cannot be shown as it stands. The build
+    # number is the reliable discriminator: 22000 and above is Windows 11.
     $nt = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -ErrorAction SilentlyContinue
-    $ctl.TxtEdition.Text = "$($nt.ProductName) (EditionID: $($nt.EditionID))"
+    $osName = [string]$nt.ProductName
+    $osBuild = 0
+    [void][int]::TryParse([string]$nt.CurrentBuild, [ref]$osBuild)
+    if ($osBuild -ge 22000) { $osName = $osName -replace '^Windows 10\b', 'Windows 11' }
+    $osParts = @()
+    if ($nt.DisplayVersion) { $osParts += [string]$nt.DisplayVersion }
+    if ($nt.CurrentBuild)   { $osParts += "Build $($nt.CurrentBuild).$($nt.UBR)" }
+    $edTxt = "$osName (EditionID: $($nt.EditionID))"
+    if ($osParts.Count) { $edTxt += '  —  ' + ($osParts -join ', ') }
+    $ctl.TxtEdition.Text = $edTxt
 
     # --- Restore points ---
     $punkte = @(Get-RestorePoints)

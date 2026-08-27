@@ -16,6 +16,9 @@ any time. The window also links to the project and to the
 [short guide](https://henmedia.github.io/windows-pitr-config/guide.html), which opens in the
 language you are currently using.
 
+![The tool running on Windows 11 Pro: current state, existing restore points, and the four
+settings](docs/screenshot.png)
+
 > **This is an unofficial approach.** The configuration values it writes are undocumented by
 > Microsoft; they were recovered by analysing the Windows binaries. A future Windows release
 > may change them, at which point the Windows default behaviour simply applies again. The

@@ -4,6 +4,24 @@ Notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] — 2026-08-27
+
+### Fixed
+
+- The Windows edition was shown as *Windows 10 Pro* on Windows 11. The tool read
+  `ProductName` from the registry, and Microsoft never updated that value for Windows 11 —
+  it still reads "Windows 10" there, for application compatibility. The build number is used
+  as the discriminator instead: 22000 and above is Windows 11.
+
+- Restore point timestamps were formatted as `dd.MM.yyyy`, a German convention, in every
+  language. They now follow the date format of the user's region, like every other date
+  in the window.
+
+### Changed
+
+- The state line now also shows the feature update and the full build, for example
+  `Windows 11 Pro (EditionID: Professional) — 25H2, Build 26200.9168`.
+
 ## [1.2.0] — 2026-08-27
 
 ### Added
