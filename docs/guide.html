@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pitr-config — Guide</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1c2024; --muted: #5b6470; --rule: #e2e6ea;
+    --surface: #f7f9fb; --accent: #1f6feb; --accent-bg: #eaf2fe;
+    --warn: #8a6100; --warn-bg: #fff7e6; --warn-rule: #e8cf9a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14181d; --fg: #e6e9ec; --muted: #9aa4b0; --rule: #2a3038;
+      --surface: #1b2027; --accent: #6fa8ff; --accent-bg: #17242f;
+      --warn: #e5bd6a; --warn-bg: #2a2418; --warn-rule: #4b3f22;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 28px 22px 72px; }
+
+  .langbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 26px; }
+  .langbar button {
+    font: inherit; font-size: 13px; padding: 6px 13px; cursor: pointer;
+    background: var(--surface); color: var(--fg);
+    border: 1px solid var(--rule); border-radius: 5px;
+  }
+  .langbar button:hover { border-color: var(--accent); }
+  .langbar button[aria-current="true"] {
+    background: var(--accent-bg); border-color: var(--accent);
+    color: var(--accent); font-weight: 600;
+  }
+
+  h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: .95rem; margin: 0 0 26px; }
+  h2 { font-size: 1.12rem; margin: 34px 0 10px; padding-top: 16px; border-top: 1px solid var(--rule); }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  code {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .88em;
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 1px 5px;
+  }
+  a { color: var(--accent); }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; margin: 0 0 14px; }
+  table { border-collapse: collapse; width: 100%; font-size: .94rem; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { background: var(--surface); font-weight: 600; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+
+  .note {
+    background: var(--warn-bg); border: 1px solid var(--warn-rule);
+    border-radius: 6px; padding: 12px 15px; margin: 0 0 14px;
+  }
+  .note p { margin: 0 0 8px; font-size: .95rem; }
+  .note p:last-child { margin: 0; }
+  .note b { color: var(--warn); }
+
+  footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--rule);
+           color: var(--muted); font-size: .88rem; }
+  section[hidden] { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="langbar" id="langbar">
+  <button type="button" data-lang="en">EN</button>
+  <button type="button" data-lang="de">DE</button>
+  <button type="button" data-lang="es">ES</button>
+  <button type="button" data-lang="fr">FR</button>
+  <button type="button" data-lang="pt">PT</button>
+</nav>
+
+<!-- ============================================================= ENGLISH == -->
+<section data-lang="en" hidden>
+  <h1>pitr-config — short guide</h1>
+  <p class="sub">Configuring Point-in-time restore on Windows 11.</p>
+
+  <h2>What this tool is for</h2>
+  <p>Windows 11 can take full system snapshots and roll the machine back to an earlier
+     state. How <b>often</b> it does that and how <b>long</b> a snapshot is kept can only be
+     set on the Enterprise edition — everywhere else those two dropdowns are greyed out.</p>
+  <p>This tool sets them anyway. The restriction lives in the Settings user interface, not
+     in the engine underneath, and the engine takes its configuration from a place the tool
+     can write to directly.</p>
+
+  <h2>Getting started</h2>
+  <p>Double-click <code>pitr-config.cmd</code>. It asks for administrator rights itself, then
+     opens a window. Nothing is written until you press a button.</p>
+  <p>The language is picked from your Windows display language; the buttons in the top right
+     switch it at any time.</p>
+
+  <h2>The buttons</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Apply</th><td>Writes your settings. A new frequency takes effect the next time the scheduled task runs.</td></tr>
+    <tr><th>Apply and run now</th><td>Writes the settings and runs the task immediately, so a restore point is created and the schedule is recalculated at once.</td></tr>
+    <tr><th>Refresh</th><td>Re-reads the current state.</td></tr>
+    <tr><th>Reset everything</th><td>Removes every value the tool has written, after asking. Windows returns to its own defaults.</td></tr>
+  </table></div>
+
+  <h2>The settings</h2>
+  <ul>
+    <li><b>Feature enabled</b> — switches Point-in-time restore on or off.</li>
+    <li><b>Frequency</b> — 1 to 24 hours between restore points.</li>
+    <li><b>Retention</b> — 1 to 7 days before a point is deleted automatically.</li>
+    <li><b>Maximum storage</b> — 2 to 50 GB for all restore points together.</li>
+  </ul>
+  <p>Each list starts with <b>Windows default</b>, which removes that single override again.
+     Underneath each list, in grey, you can see the value currently in effect and where it
+     comes from.</p>
+
+  <h2>Three things worth knowing</h2>
+  <div class="note">
+    <p><b>Frequency is an earliest possible interval, not a promise.</b> Restore points are
+       only created while the system is idle. If you are using the machine, or it is switched
+       off, the run is postponed and a slot can be skipped entirely. Setting one hour on a
+       machine used all day will not produce twenty-four points. The window shows the task
+       status so you can see when a run is waiting.</p>
+    <p><b>Only the Windows drive is covered.</b> Other partitions and other disks are not
+       included, not even on the same physical disk. Data there is neither protected nor
+       rolled back, and still needs a backup of its own.</p>
+    <p><b>This is an unofficial route.</b> The configuration values are not documented by
+       Microsoft. A future Windows release may change them, at which point the normal Windows
+       behaviour simply applies again.</p>
+  </div>
+
+  <h2>Undoing everything</h2>
+  <p><b>Reset everything</b> removes all of it in one step. Existing restore points are never
+     deleted by this tool — it only changes configuration.</p>
+</section>
+
+<!-- ============================================================== GERMAN == -->
+<section data-lang="de" hidden>
+  <h1>pitr-config — Kurzanleitung</h1>
+  <p class="sub">Die Zeitpunktwiederherstellung von Windows 11 einstellen.</p>
+
+  <h2>Wofür das Werkzeug da ist</h2>
+  <p>Windows 11 kann vollständige Systemabbilder anlegen und den Rechner auf einen früheren
+     Stand zurücksetzen. Wie <b>oft</b> das geschieht und wie <b>lange</b> ein Abbild
+     aufgehoben wird, lässt sich nur auf der Enterprise-Edition einstellen — überall sonst
+     sind diese beiden Auswahlfelder ausgegraut.</p>
+  <p>Dieses Werkzeug setzt sie trotzdem. Die Sperre sitzt allein in der Oberfläche der
+     Einstellungen, nicht in der darunterliegenden Engine, und die Engine liest ihre
+     Konfiguration von einer Stelle, die das Werkzeug direkt beschreiben kann.</p>
+
+  <h2>Erste Schritte</h2>
+  <p><code>pitr-config.cmd</code> doppelklicken. Die Datei fordert selbst Administratorrechte
+     an und öffnet ein Fenster. Geschrieben wird erst, wenn Sie eine Schaltfläche drücken.</p>
+  <p>Die Sprache richtet sich nach Ihrer Windows-Anzeigesprache; die Schaltflächen oben rechts
+     stellen sie jederzeit um.</p>
+
+  <h2>Die Schaltflächen</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Übernehmen</th><td>Schreibt Ihre Einstellungen. Eine neue Häufigkeit wird beim nächsten Lauf der geplanten Aufgabe wirksam.</td></tr>
+    <tr><th>Übernehmen und sofort ausführen</th><td>Schreibt die Einstellungen und stößt die Aufgabe direkt an, sodass sofort ein Punkt entsteht und der Zeitplan neu berechnet wird.</td></tr>
+    <tr><th>Aktualisieren</th><td>Liest den aktuellen Zustand neu ein.</td></tr>
+    <tr><th>Alles zurücksetzen</th><td>Entfernt nach Rückfrage alle vom Werkzeug geschriebenen Werte. Windows kehrt zu seinen eigenen Vorgaben zurück.</td></tr>
+  </table></div>
+
+  <h2>Die Einstellungen</h2>
+  <ul>
+    <li><b>Feature aktiv</b> — schaltet die Zeitpunktwiederherstellung ein oder aus.</li>
+    <li><b>Häufigkeit</b> — 1 bis 24 Stunden Abstand zwischen zwei Punkten.</li>
+    <li><b>Aufbewahrung</b> — 1 bis 7 Tage, bis ein Punkt automatisch gelöscht wird.</li>
+    <li><b>Maximaler Speicherplatz</b> — 2 bis 50 GB für alle Punkte zusammen.</li>
+  </ul>
+  <p>Jede Liste beginnt mit <b>Windows-Standard</b>; damit wird genau diese eine
+     Überschreibung wieder entfernt. Unter jeder Liste steht in Grau der aktuell wirksame
+     Wert und woher er stammt.</p>
+
+  <h2>Drei Dinge, die man wissen sollte</h2>
+  <div class="note">
+    <p><b>Die Häufigkeit ist ein frühestmöglicher Abstand, keine Zusage.</b>
+       Wiederherstellungspunkte entstehen nur, wenn das System im Leerlauf ist. Wird der
+       Rechner benutzt oder ist er ausgeschaltet, verschiebt sich der Lauf, und ein Termin
+       kann ganz ausfallen. Wer eine Stunde einstellt und den Rechner den ganzen Tag benutzt,
+       bekommt keine vierundzwanzig Punkte. Das Fenster zeigt den Status der Aufgabe an, damit
+       erkennbar ist, wann ein Lauf wartet.</p>
+    <p><b>Erfasst wird nur das Windows-Laufwerk.</b> Weitere Partitionen und weitere
+       Festplatten sind nicht dabei — auch nicht auf derselben physischen Platte. Daten dort
+       werden weder geschützt noch zurückgesetzt und brauchen weiterhin eine eigene
+       Sicherung.</p>
+    <p><b>Das ist ein inoffizieller Weg.</b> Die Konfigurationswerte sind von Microsoft nicht
+       dokumentiert. Eine künftige Windows-Version kann sie ändern; dann gilt wieder das
+       normale Verhalten von Windows.</p>
+  </div>
+
+  <h2>Alles rückgängig machen</h2>
+  <p><b>Alles zurücksetzen</b> entfernt sämtliche Werte in einem Schritt. Vorhandene
+     Wiederherstellungspunkte löscht das Werkzeug nie — es ändert ausschließlich die
+     Konfiguration.</p>
+</section>
+
+<!-- ============================================================= SPANISH == -->
+<section data-lang="es" hidden>
+  <h1>pitr-config — guía breve</h1>
+  <p class="sub">Configurar Point-in-time restore en Windows 11.</p>
+
+  <h2>Para qué sirve esta herramienta</h2>
+  <p>Windows 11 puede crear instantáneas completas del sistema y devolver el equipo a un
+     estado anterior. Con qué <b>frecuencia</b> lo hace y <b>cuánto tiempo</b> conserva cada
+     instantánea solo puede ajustarse en la edición Enterprise: en las demás, esas dos listas
+     aparecen atenuadas.</p>
+  <p>Esta herramienta las ajusta de todos modos. La restricción está únicamente en la interfaz
+     de Configuración, no en el motor que hay debajo, y ese motor lee su configuración de un
+     lugar en el que la herramienta puede escribir directamente.</p>
+
+  <h2>Primeros pasos</h2>
+  <p>Haga doble clic en <code>pitr-config.cmd</code>. El archivo solicita por sí mismo permisos
+     de administrador y abre una ventana. No se escribe nada hasta que pulse un botón.</p>
+  <p>El idioma se toma del idioma de presentación de Windows; los botones de arriba a la
+     derecha lo cambian en cualquier momento.</p>
+
+  <h2>Los botones</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Aplicar</th><td>Escribe sus ajustes. Una frecuencia nueva surte efecto en la siguiente ejecución de la tarea programada.</td></tr>
+    <tr><th>Aplicar y ejecutar ahora</th><td>Escribe los ajustes y ejecuta la tarea de inmediato, de modo que se crea un punto y el calendario se recalcula al instante.</td></tr>
+    <tr><th>Actualizar</th><td>Vuelve a leer el estado actual.</td></tr>
+    <tr><th>Restablecer todo</th><td>Elimina, tras confirmación, todos los valores escritos por la herramienta. Windows vuelve a sus propios valores predeterminados.</td></tr>
+  </table></div>
+
+  <h2>Los ajustes</h2>
+  <ul>
+    <li><b>Función activada</b> — activa o desactiva Point-in-time restore.</li>
+    <li><b>Frecuencia</b> — de 1 a 24 horas entre puntos de restauración.</li>
+    <li><b>Conservación</b> — de 1 a 7 días antes de que un punto se elimine automáticamente.</li>
+    <li><b>Espacio máximo</b> — de 2 a 50 GB para todos los puntos en conjunto.</li>
+  </ul>
+  <p>Cada lista empieza por <b>Valor predeterminado de Windows</b>, que elimina de nuevo esa
+     sobrescritura concreta. Debajo de cada lista, en gris, se ve el valor actualmente en vigor
+     y de dónde procede.</p>
+
+  <h2>Tres cosas que conviene saber</h2>
+  <div class="note">
+    <p><b>La frecuencia es un intervalo mínimo, no una promesa.</b> Los puntos de restauración
+       solo se crean cuando el sistema está inactivo. Si está usando el equipo, o si está
+       apagado, la ejecución se aplaza y una cita puede omitirse por completo. Configurar una
+       hora en un equipo que se usa todo el día no producirá veinticuatro puntos. La ventana
+       muestra el estado de la tarea para que vea cuándo hay una ejecución en espera.</p>
+    <p><b>Solo se incluye la unidad de Windows.</b> Otras particiones y otros discos quedan
+       fuera, incluso en el mismo disco físico. Los datos que haya allí no se protegen ni se
+       revierten, y siguen necesitando su propia copia de seguridad.</p>
+    <p><b>Esta es una vía no oficial.</b> Los valores de configuración no están documentados
+       por Microsoft. Una versión futura de Windows puede cambiarlos; entonces volverá a
+       aplicarse simplemente el comportamiento normal de Windows.</p>
+  </div>
+
+  <h2>Deshacerlo todo</h2>
+  <p><b>Restablecer todo</b> lo elimina en un solo paso. La herramienta nunca borra puntos de
+     restauración existentes: solo cambia la configuración.</p>
+</section>
+
+<!-- ============================================================== FRENCH == -->
+<section data-lang="fr" hidden>
+  <h1>pitr-config — guide rapide</h1>
+  <p class="sub">Configurer Point-in-time restore sous Windows 11.</p>
+
+  <h2>À quoi sert cet outil</h2>
+  <p>Windows 11 peut créer des instantanés complets du système et ramener la machine à un
+     état antérieur. La <b>fréquence</b> à laquelle il le fait et la <b>durée</b> de
+     conservation d'un instantané ne peuvent être réglées que sur l'édition Enterprise :
+     ailleurs, ces deux listes sont grisées.</p>
+  <p>Cet outil les règle malgré tout. La restriction se trouve uniquement dans l'interface des
+     Paramètres, pas dans le moteur sous-jacent, et ce moteur lit sa configuration à un
+     endroit où l'outil peut écrire directement.</p>
+
+  <h2>Premiers pas</h2>
+  <p>Double-cliquez sur <code>pitr-config.cmd</code>. Le fichier demande lui-même les droits
+     d'administrateur et ouvre une fenêtre. Rien n'est écrit tant que vous n'avez pas appuyé
+     sur un bouton.</p>
+  <p>La langue suit la langue d'affichage de Windows ; les boutons en haut à droite la
+     changent à tout moment.</p>
+
+  <h2>Les boutons</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Appliquer</th><td>Écrit vos réglages. Une nouvelle fréquence prend effet à la prochaine exécution de la tâche planifiée.</td></tr>
+    <tr><th>Appliquer et exécuter maintenant</th><td>Écrit les réglages et lance la tâche immédiatement : un point est créé et la planification est recalculée aussitôt.</td></tr>
+    <tr><th>Actualiser</th><td>Relit l'état actuel.</td></tr>
+    <tr><th>Tout réinitialiser</th><td>Supprime, après confirmation, toutes les valeurs écrites par l'outil. Windows revient à ses propres valeurs par défaut.</td></tr>
+  </table></div>
+
+  <h2>Les réglages</h2>
+  <ul>
+    <li><b>Fonctionnalité activée</b> — active ou désactive Point-in-time restore.</li>
+    <li><b>Fréquence</b> — de 1 à 24 heures entre deux points de restauration.</li>
+    <li><b>Conservation</b> — de 1 à 7 jours avant la suppression automatique d'un point.</li>
+    <li><b>Espace maximal</b> — de 2 à 50 Go pour l'ensemble des points.</li>
+  </ul>
+  <p>Chaque liste commence par <b>Valeur par défaut de Windows</b>, ce qui supprime à nouveau
+     ce remplacement précis. Sous chaque liste, en gris, figure la valeur actuellement
+     appliquée et sa provenance.</p>
+
+  <h2>Trois choses à savoir</h2>
+  <div class="note">
+    <p><b>La fréquence est un intervalle minimal, pas une promesse.</b> Les points de
+       restauration ne sont créés que lorsque le système est inactif. Si vous utilisez la
+       machine, ou si elle est éteinte, l'exécution est reportée et un créneau peut être
+       ignoré. Régler une heure sur une machine utilisée toute la journée ne produira pas
+       vingt-quatre points. La fenêtre affiche l'état de la tâche pour que vous voyiez quand
+       une exécution est en attente.</p>
+    <p><b>Seul le lecteur Windows est pris en compte.</b> Les autres partitions et les autres
+       disques sont exclus, même sur le même disque physique. Les données qui s'y trouvent ne
+       sont ni protégées ni restaurées et ont toujours besoin de leur propre sauvegarde.</p>
+    <p><b>Il s'agit d'une voie non officielle.</b> Les valeurs de configuration ne sont pas
+       documentées par Microsoft. Une future version de Windows peut les modifier ; le
+       comportement normal de Windows s'appliquera alors de nouveau.</p>
+  </div>
+
+  <h2>Tout annuler</h2>
+  <p><b>Tout réinitialiser</b> supprime l'ensemble en une seule étape. L'outil ne supprime
+     jamais les points de restauration existants : il ne modifie que la configuration.</p>
+</section>
+
+<!-- ========================================================== PORTUGUESE == -->
+<section data-lang="pt" hidden>
+  <h1>pitr-config — guia rápido</h1>
+  <p class="sub">Configurar o Point-in-time restore no Windows 11.</p>
+
+  <h2>Para que serve esta ferramenta</h2>
+  <p>O Windows 11 pode criar instantâneos completos do sistema e reverter o computador para um
+     estado anterior. Com que <b>frequência</b> isso acontece e por <b>quanto tempo</b> um
+     instantâneo é mantido só podem ser ajustados na edição Enterprise — nas demais, essas
+     duas listas ficam esmaecidas.</p>
+  <p>Esta ferramenta ajusta esses valores mesmo assim. A restrição está apenas na interface do
+     app Configurações, não no mecanismo por baixo, e esse mecanismo lê sua configuração de um
+     lugar onde a ferramenta pode gravar diretamente.</p>
+
+  <h2>Primeiros passos</h2>
+  <p>Dê um duplo clique em <code>pitr-config.cmd</code>. O arquivo solicita por conta própria
+     direitos de administrador e abre uma janela. Nada é gravado até você pressionar um
+     botão.</p>
+  <p>O idioma segue o idioma de exibição do Windows; os botões no canto superior direito
+     mudam o idioma a qualquer momento.</p>
+
+  <h2>Os botões</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Aplicar</th><td>Grava suas configurações. Uma nova frequência entra em vigor na próxima execução da tarefa agendada.</td></tr>
+    <tr><th>Aplicar e executar agora</th><td>Grava as configurações e executa a tarefa imediatamente, criando um ponto e recalculando o agendamento na hora.</td></tr>
+    <tr><th>Atualizar</th><td>Relê o estado atual.</td></tr>
+    <tr><th>Redefinir tudo</th><td>Remove, após confirmação, todos os valores gravados pela ferramenta. O Windows volta aos próprios padrões.</td></tr>
+  </table></div>
+
+  <h2>As configurações</h2>
+  <ul>
+    <li><b>Recurso ativado</b> — liga ou desliga o Point-in-time restore.</li>
+    <li><b>Frequência</b> — de 1 a 24 horas entre pontos de restauração.</li>
+    <li><b>Retenção</b> — de 1 a 7 dias até um ponto ser excluído automaticamente.</li>
+    <li><b>Espaço máximo</b> — de 2 a 50 GB para todos os pontos juntos.</li>
+  </ul>
+  <p>Cada lista começa com <b>Padrão do Windows</b>, o que remove novamente aquela substituição
+     específica. Abaixo de cada lista, em cinza, aparece o valor atualmente em vigor e de onde
+     ele vem.</p>
+
+  <h2>Três coisas que vale saber</h2>
+  <div class="note">
+    <p><b>A frequência é um intervalo mínimo, não uma promessa.</b> Os pontos de restauração só
+       são criados quando o sistema está ocioso. Se você estiver usando o computador, ou se ele
+       estiver desligado, a execução é adiada e um horário pode ser pulado por completo.
+       Configurar uma hora em um computador usado o dia inteiro não vai gerar vinte e quatro
+       pontos. A janela mostra o status da tarefa para você ver quando uma execução está
+       aguardando.</p>
+    <p><b>Apenas a unidade do Windows é incluída.</b> Outras partições e outros discos ficam de
+       fora, mesmo no mesmo disco físico. Os dados ali não são protegidos nem revertidos e
+       continuam precisando do próprio backup.</p>
+    <p><b>Este é um caminho não oficial.</b> Os valores de configuração não são documentados
+       pela Microsoft. Uma versão futura do Windows pode alterá-los; nesse caso volta a valer
+       simplesmente o comportamento normal do Windows.</p>
+  </div>
+
+  <h2>Desfazer tudo</h2>
+  <p><b>Redefinir tudo</b> remove tudo em uma única etapa. A ferramenta nunca exclui pontos de
+     restauração existentes — ela apenas altera a configuração.</p>
+</section>
+
+<footer>
+  <a href="https://github.com/henmedia/windows-pitr-config">github.com/henmedia/windows-pitr-config</a>
+  · MIT
+</footer>
+
+</div>
+<script>
+(function () {
+  var CODES = ['en', 'de', 'es', 'fr', 'pt'];
+
+  function pick() {
+    var h = (location.hash || '').replace('#', '').toLowerCase();
+    if (CODES.indexOf(h) >= 0) { return h; }
+    var langs = navigator.languages || [navigator.language || ''];
+    for (var i = 0; i < langs.length; i++) {
+      var two = String(langs[i]).slice(0, 2).toLowerCase();
+      if (CODES.indexOf(two) >= 0) { return two; }
+    }
+    return 'en';
+  }
+
+  function show(code) {
+    CODES.forEach(function (c) {
+      var sec = document.querySelector('section[data-lang="' + c + '"]');
+      if (sec) { sec.hidden = (c !== code); }
+      var btn = document.querySelector('#langbar button[data-lang="' + c + '"]');
+      if (btn) { btn.setAttribute('aria-current', c === code ? 'true' : 'false'); }
+    });
+    document.documentElement.lang = code;
+  }
+
+  document.getElementById('langbar').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-lang]');
+    if (!btn) { return; }
+    var code = btn.getAttribute('data-lang');
+    // Recorded in the address so the page can be linked per language - that is how the
+    // tool opens it, and it survives a reload.
+    if (history.replaceState) { history.replaceState(null, '', '#' + code); }
+    else { location.hash = code; }
+    show(code);
+  });
+
+  window.addEventListener('hashchange', function () { show(pick()); });
+  show(pick());
+})();
+</script>
+</body>
+</html>

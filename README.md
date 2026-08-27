@@ -2,6 +2,7 @@
 
 [![Download pitr-config.cmd](https://img.shields.io/badge/download-pitr--config.cmd-2ea44f?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/henmedia/windows-pitr-config/releases/latest/download/pitr-config.cmd)
 [![Latest release](https://img.shields.io/github/v/release/henmedia/windows-pitr-config?style=for-the-badge&label=version&color=555555)](https://github.com/henmedia/windows-pitr-config/releases/latest)
+[![Guide](https://img.shields.io/badge/guide-EN%20DE%20ES%20FR%20PT-1f6feb?style=for-the-badge)](https://henmedia.github.io/windows-pitr-config/guide.html)
 
 Configure **Point-in-time restore** (PITR) on Windows 11 — including the frequency and
 retention settings that Microsoft exposes on the Enterprise edition only.
@@ -9,8 +10,11 @@ retention settings that Microsoft exposes on the Enterprise edition only.
 A single, self-contained `.cmd` file with a graphical interface. No installation, no
 dependencies, no PowerShell modules. Copy it to a USB stick and run it anywhere.
 
-The interface is bilingual (English / German) and picks your Windows display language
-automatically; a button in the top right switches languages at any time.
+The interface speaks **English, German, Spanish, French and Portuguese**. It starts in
+whichever one matches your Windows display language; the buttons in the top right switch at
+any time. The window also links to the project and to the
+[short guide](https://henmedia.github.io/windows-pitr-config/guide.html), which opens in the
+language you are currently using.
 
 > **This is an unofficial approach.** The configuration values it writes are undocumented by
 > Microsoft; they were recovered by analysing the Windows binaries. A future Windows release
@@ -140,6 +144,10 @@ greyed out — on a machine under no management at all.
 version shown under the headline in the window tells you which release you are running.
 
 Double-click `pitr-config.cmd`. It requests administrator rights itself (UAC).
+
+A [short guide](https://henmedia.github.io/windows-pitr-config/guide.html) covers the same
+ground in all five languages. Downloading `guide.html` next to `pitr-config.cmd` makes the
+tool open that local copy instead, which keeps it fully usable on a stick without a network.
 
 Browsers treat `.cmd` files as executable content, so the download may need one confirmation
 before it is kept. Every release lists the SHA-256 of its file, which is worth comparing
