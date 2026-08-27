@@ -2,7 +2,7 @@
 rem ===========================================================================
 rem  pitr-config.cmd
 rem  Configures Point-in-time restore / Zeitpunktwiederherstellung (Windows 11).
-rem  Five languages: English, German, Spanish, French and Portuguese. The one
+rem  Five languages: English, German, French, Spanish and Portuguese. The one
 rem  matching the Windows display language is picked automatically.
 rem
 rem  Single file: the complete PowerShell code sits below the #___PSCODE___
@@ -40,7 +40,7 @@ exit /b
 #___PSCODE___
 <#
     Point-in-time restore (PITR) / Zeitpunktwiederherstellung
-    Graphical configuration tool in EN, DE, ES, FR and PT.
+    Graphical configuration tool in EN, DE, FR, ES and PT.
 
     The PITR engine reads its configuration from
         HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\Recovery\PITR\Settings
@@ -318,107 +318,6 @@ de = @{
     askResetT  = 'Zurücksetzen'
 }
 
-# ----------------------------------------------------------------- Spanish --
-es = @{
-    winTitle   = 'Point-in-time restore'
-    headline   = 'Point-in-time restore'
-    subtitle   = 'Restauración a un momento anterior (PITR)'
-    intro      = 'Windows solo ofrece la frecuencia y la conservación en la edición Enterprise. Esta herramienta las escribe directamente en la configuración del motor PITR, que no comprueba la edición.'
-    lnkGuide   = 'Guía'
-    tipProject = 'Abrir la página del proyecto en GitHub'
-    tipGuide   = 'Abrir la guía breve en el navegador'
-
-    grpState   = 'Estado actual'
-    capEdition = 'Edición de Windows:'
-    capLast    = 'Última ejecución:'
-    capNext    = 'Próxima ejecución:'
-    capDelta   = 'Intervalo programado:'
-    capTaskSt  = 'Estado de la tarea:'
-    tsReady    = 'lista'
-    tsQueued   = 'esperando a que el sistema esté inactivo'
-    tsRunning  = 'en ejecución'
-    tsDisabled = 'desactivada'
-    tsOverdue  = 'retrasada'
-    noteIdle   = 'Los puntos de restauración solo se crean cuando el sistema está inactivo. Si el equipo se está usando o está apagado, la ejecución se aplaza — y una cita programada puede omitirse por completo. Por eso la frecuencia configurada es el intervalo mínimo posible, no una garantía. Con «Aplicar y ejecutar ahora» puede forzar un punto en cualquier momento.'
-
-    grpPoints  = 'Puntos de restauración'
-    lblCount   = 'Cantidad'
-    lblOldest  = 'Punto más antiguo'
-    lblStorage = 'Almacenamiento en la unidad'
-    stUsed     = 'en uso'
-    stAlloc    = 'reservado'
-    stMax      = 'límite'
-    stNoAdmin  = 'no disponible (se requieren permisos de administrador)'
-    noteStore  = 'Windows informa del almacenamiento por unidad, nunca por punto — todos los puntos comparten una misma área de diferencias.'
-    tipStore   = 'En uso = datos realmente escritos por las instantáneas.' + [Environment]::NewLine +
-                 'Reservado = espacio que VSS ya ha reclamado en el disco. Deja de estar disponible para otros archivos, pero todavía no está lleno.' + [Environment]::NewLine +
-                 'Límite = tope configurado; el área no crece más allá.'
-    noteVolume = 'Solo se incluye la unidad de Windows {0}. Otras particiones y otros discos quedan fuera — incluso si están en el mismo disco físico. No se capturan ni se revierten en una restauración, así que los datos que haya allí siguen necesitando su propia copia de seguridad. El límite de almacenamiento de abajo también se aplica únicamente a {0}.'
-
-    colTime    = 'Fecha y hora'
-    colAge     = 'Antigüedad'
-    colStatus  = 'Estado'
-    colBuild   = 'Compilación'
-    stShadowOk = 'instantánea presente'
-    stRegOnly  = 'solo entrada del registro'
-    stUnknown  = 'desconocido (se requieren permisos de administrador)'
-
-    grpSet     = 'Configuración'
-    capActive  = 'Función activada'
-    capFreq    = 'Frecuencia — intervalo entre puntos de restauración'
-    capReten   = 'Conservación — vida útil de un punto de restauración'
-    capSize    = 'Espacio máximo para todos los puntos de restauración'
-
-    optNoOver  = 'Valor predeterminado de Windows (no sobrescribir)'
-    optOn      = 'Activado'
-    optOff     = 'Desactivado'
-    optStdFreq = 'Valor predeterminado de Windows (24 horas)'
-    optStdRet  = 'Valor predeterminado de Windows (3 días / 72 horas)'
-    unitHour   = 'hora'
-    unitHours  = 'horas'
-    unitDay    = 'día'
-    unitDays   = 'días'
-    unitMin    = 'minutos'
-
-    btnReset   = 'Restablecer todo'
-    btnRefresh = 'Actualizar'
-    btnApply   = 'Aplicar'
-    btnApplyNow= 'Aplicar y ejecutar ahora'
-    grpLog     = 'Registro'
-
-    effective  = 'Actualmente en vigor'
-    source     = 'origen'
-    winDefault = 'Valor predeterminado de Windows'
-    srcGPO     = 'directiva (esta herramienta)'
-    srcCSP     = 'Intune/MDM'
-    srcUX      = 'app Configuración'
-    sizeStd    = 'Valor predeterminado de Windows (2% del disco)'
-
-    carryOver  = 'procede todavía del ajuste anterior; se corregirá en la próxima ejecución a'
-    proven72   = 'más de 72 horas: la conservación ampliada funciona de forma demostrable'
-    unofficial = 'Solución no oficial: los valores de configuración que se escriben aquí no están documentados por Microsoft y pueden cambiar en futuras versiones de Windows. «Restablecer todo» devuelve el valor predeterminado de Windows en cualquier momento.'
-    taskMissing= 'PITRTask no encontrada'
-    unknownTxt = 'desconocido'
-
-    logReady   = 'Listo. Los valores se escriben en el nivel de directiva y tienen prioridad sobre la app Configuración.'
-    logNoAdmin = 'ADVERTENCIA: sin permisos de administrador no se puede guardar ningún valor.'
-    logRefresh = 'Vista actualizada.'
-    logSaved   = 'Guardado. Surtirá efecto en la próxima ejecución de PITRTask (que solo se ejecuta con el sistema inactivo).'
-    logCleared = 'sobrescritura eliminada -> valor predeterminado de Windows'
-    logIdleOff = 'Condición de inactividad suspendida temporalmente.'
-    logStarted = 'PITRTask iniciada, esperando a que termine...'
-    logIdleOn  = 'Condición de inactividad restaurada.'
-    logIdleErr = 'Condición de inactividad restaurada tras un error.'
-    logIdleBad = 'ADVERTENCIA: no se pudo restaurar la condición de inactividad.'
-    logDone    = 'Terminado. Resultado'
-    logNextRun = 'próxima ejecución'
-    logRemoved = 'eliminado'
-    logNothing = 'No había ningún valor establecido.'
-    logError   = 'Error'
-    askReset   = '¿Eliminar todos los valores establecidos por esta herramienta y volver al valor predeterminado de Windows?'
-    askResetT  = 'Restablecer'
-}
-
 # ------------------------------------------------------------------ French --
 # Apostrophes here are plain ASCII and doubled, because that is how a single-quoted
 # PowerShell string escapes one. Do NOT "fix" them to the typographic U+2019: Windows
@@ -522,6 +421,107 @@ fr = @{
     logError   = 'Erreur'
     askReset   = 'Supprimer toutes les valeurs définies par cet outil et revenir à la valeur par défaut de Windows ?'
     askResetT  = 'Réinitialiser'
+}
+
+# ----------------------------------------------------------------- Spanish --
+es = @{
+    winTitle   = 'Point-in-time restore'
+    headline   = 'Point-in-time restore'
+    subtitle   = 'Restauración a un momento anterior (PITR)'
+    intro      = 'Windows solo ofrece la frecuencia y la conservación en la edición Enterprise. Esta herramienta las escribe directamente en la configuración del motor PITR, que no comprueba la edición.'
+    lnkGuide   = 'Guía'
+    tipProject = 'Abrir la página del proyecto en GitHub'
+    tipGuide   = 'Abrir la guía breve en el navegador'
+
+    grpState   = 'Estado actual'
+    capEdition = 'Edición de Windows:'
+    capLast    = 'Última ejecución:'
+    capNext    = 'Próxima ejecución:'
+    capDelta   = 'Intervalo programado:'
+    capTaskSt  = 'Estado de la tarea:'
+    tsReady    = 'lista'
+    tsQueued   = 'esperando a que el sistema esté inactivo'
+    tsRunning  = 'en ejecución'
+    tsDisabled = 'desactivada'
+    tsOverdue  = 'retrasada'
+    noteIdle   = 'Los puntos de restauración solo se crean cuando el sistema está inactivo. Si el equipo se está usando o está apagado, la ejecución se aplaza — y una cita programada puede omitirse por completo. Por eso la frecuencia configurada es el intervalo mínimo posible, no una garantía. Con «Aplicar y ejecutar ahora» puede forzar un punto en cualquier momento.'
+
+    grpPoints  = 'Puntos de restauración'
+    lblCount   = 'Cantidad'
+    lblOldest  = 'Punto más antiguo'
+    lblStorage = 'Almacenamiento en la unidad'
+    stUsed     = 'en uso'
+    stAlloc    = 'reservado'
+    stMax      = 'límite'
+    stNoAdmin  = 'no disponible (se requieren permisos de administrador)'
+    noteStore  = 'Windows informa del almacenamiento por unidad, nunca por punto — todos los puntos comparten una misma área de diferencias.'
+    tipStore   = 'En uso = datos realmente escritos por las instantáneas.' + [Environment]::NewLine +
+                 'Reservado = espacio que VSS ya ha reclamado en el disco. Deja de estar disponible para otros archivos, pero todavía no está lleno.' + [Environment]::NewLine +
+                 'Límite = tope configurado; el área no crece más allá.'
+    noteVolume = 'Solo se incluye la unidad de Windows {0}. Otras particiones y otros discos quedan fuera — incluso si están en el mismo disco físico. No se capturan ni se revierten en una restauración, así que los datos que haya allí siguen necesitando su propia copia de seguridad. El límite de almacenamiento de abajo también se aplica únicamente a {0}.'
+
+    colTime    = 'Fecha y hora'
+    colAge     = 'Antigüedad'
+    colStatus  = 'Estado'
+    colBuild   = 'Compilación'
+    stShadowOk = 'instantánea presente'
+    stRegOnly  = 'solo entrada del registro'
+    stUnknown  = 'desconocido (se requieren permisos de administrador)'
+
+    grpSet     = 'Configuración'
+    capActive  = 'Función activada'
+    capFreq    = 'Frecuencia — intervalo entre puntos de restauración'
+    capReten   = 'Conservación — vida útil de un punto de restauración'
+    capSize    = 'Espacio máximo para todos los puntos de restauración'
+
+    optNoOver  = 'Valor predeterminado de Windows (no sobrescribir)'
+    optOn      = 'Activado'
+    optOff     = 'Desactivado'
+    optStdFreq = 'Valor predeterminado de Windows (24 horas)'
+    optStdRet  = 'Valor predeterminado de Windows (3 días / 72 horas)'
+    unitHour   = 'hora'
+    unitHours  = 'horas'
+    unitDay    = 'día'
+    unitDays   = 'días'
+    unitMin    = 'minutos'
+
+    btnReset   = 'Restablecer todo'
+    btnRefresh = 'Actualizar'
+    btnApply   = 'Aplicar'
+    btnApplyNow= 'Aplicar y ejecutar ahora'
+    grpLog     = 'Registro'
+
+    effective  = 'Actualmente en vigor'
+    source     = 'origen'
+    winDefault = 'Valor predeterminado de Windows'
+    srcGPO     = 'directiva (esta herramienta)'
+    srcCSP     = 'Intune/MDM'
+    srcUX      = 'app Configuración'
+    sizeStd    = 'Valor predeterminado de Windows (2% del disco)'
+
+    carryOver  = 'procede todavía del ajuste anterior; se corregirá en la próxima ejecución a'
+    proven72   = 'más de 72 horas: la conservación ampliada funciona de forma demostrable'
+    unofficial = 'Solución no oficial: los valores de configuración que se escriben aquí no están documentados por Microsoft y pueden cambiar en futuras versiones de Windows. «Restablecer todo» devuelve el valor predeterminado de Windows en cualquier momento.'
+    taskMissing= 'PITRTask no encontrada'
+    unknownTxt = 'desconocido'
+
+    logReady   = 'Listo. Los valores se escriben en el nivel de directiva y tienen prioridad sobre la app Configuración.'
+    logNoAdmin = 'ADVERTENCIA: sin permisos de administrador no se puede guardar ningún valor.'
+    logRefresh = 'Vista actualizada.'
+    logSaved   = 'Guardado. Surtirá efecto en la próxima ejecución de PITRTask (que solo se ejecuta con el sistema inactivo).'
+    logCleared = 'sobrescritura eliminada -> valor predeterminado de Windows'
+    logIdleOff = 'Condición de inactividad suspendida temporalmente.'
+    logStarted = 'PITRTask iniciada, esperando a que termine...'
+    logIdleOn  = 'Condición de inactividad restaurada.'
+    logIdleErr = 'Condición de inactividad restaurada tras un error.'
+    logIdleBad = 'ADVERTENCIA: no se pudo restaurar la condición de inactividad.'
+    logDone    = 'Terminado. Resultado'
+    logNextRun = 'próxima ejecución'
+    logRemoved = 'eliminado'
+    logNothing = 'No había ningún valor establecido.'
+    logError   = 'Error'
+    askReset   = '¿Eliminar todos los valores establecidos por esta herramienta y volver al valor predeterminado de Windows?'
+    askResetT  = 'Restablecer'
 }
 
 # -------------------------------------------------------------- Portuguese --
@@ -628,7 +628,7 @@ pt = @{
 }
 
 # Order of the language buttons, and at the same time the list of supported codes.
-$LangCodes = @('en', 'de', 'es', 'fr', 'pt')
+$LangCodes = @('en', 'de', 'fr', 'es', 'pt')
 
 # English steps in for anything a translation is missing, so a half-finished language
 # block degrades to a mixed interface instead of empty labels.
@@ -798,8 +798,8 @@ $xaml = @'
                   VerticalAlignment="Top" Margin="12,2,0,0">
         <Button x:Name="BtnLangEN" Tag="en" Content="EN" Width="38" Height="26" Margin="0,0,3,0"/>
         <Button x:Name="BtnLangDE" Tag="de" Content="DE" Width="38" Height="26" Margin="0,0,3,0"/>
-        <Button x:Name="BtnLangES" Tag="es" Content="ES" Width="38" Height="26" Margin="0,0,3,0"/>
         <Button x:Name="BtnLangFR" Tag="fr" Content="FR" Width="38" Height="26" Margin="0,0,3,0"/>
+        <Button x:Name="BtnLangES" Tag="es" Content="ES" Width="38" Height="26" Margin="0,0,3,0"/>
         <Button x:Name="BtnLangPT" Tag="pt" Content="PT" Width="38" Height="26"/>
       </StackPanel>
     </Grid>
@@ -912,7 +912,7 @@ $window = [System.Windows.Markup.XamlReader]::Load($reader)
 $ctl = @{}
 foreach ($n in 'TxtHead','TxtSub','TxtIntro','TxtUnofficial',
                'LnkProject','LnkGuide','RunGuide',
-               'BtnLangEN','BtnLangDE','BtnLangES','BtnLangFR','BtnLangPT',
+               'BtnLangEN','BtnLangDE','BtnLangFR','BtnLangES','BtnLangPT',
                'GrpState','CapEdition','TxtEdition','CapLast','TxtLast','CapNext','TxtNext',
                'CapTaskState','TxtTaskState','CapDelta','TxtDelta','TxtIdleNote',
                'GrpPoints','TxtPoints','TxtOldest','TxtStorage','TxtStoreNote','LstPoints',
@@ -1263,8 +1263,8 @@ function Set-Lang {
 # are more fragile than five plain lines.
 $ctl.BtnLangEN.Add_Click({ Set-Lang 'en' })
 $ctl.BtnLangDE.Add_Click({ Set-Lang 'de' })
-$ctl.BtnLangES.Add_Click({ Set-Lang 'es' })
 $ctl.BtnLangFR.Add_Click({ Set-Lang 'fr' })
+$ctl.BtnLangES.Add_Click({ Set-Lang 'es' })
 $ctl.BtnLangPT.Add_Click({ Set-Lang 'pt' })
 
 $ctl.LnkProject.Add_Click({

@@ -2,7 +2,7 @@
 
 [![Download pitr-config.cmd](https://img.shields.io/badge/download-pitr--config.cmd-2ea44f?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/henmedia/windows-pitr-config/releases/latest/download/pitr-config.cmd)
 [![Latest release](https://img.shields.io/github/v/release/henmedia/windows-pitr-config?style=for-the-badge&label=version&color=555555)](https://github.com/henmedia/windows-pitr-config/releases/latest)
-[![Guide](https://img.shields.io/badge/guide-EN%20DE%20ES%20FR%20PT-1f6feb?style=for-the-badge)](https://henmedia.github.io/windows-pitr-config/guide.html)
+[![Guide](https://img.shields.io/badge/guide-EN%20DE%20FR%20ES%20PT-1f6feb?style=for-the-badge)](https://henmedia.github.io/windows-pitr-config/guide.html)
 
 Configure **Point-in-time restore** (PITR) on Windows 11 — including the frequency and
 retention settings that Microsoft exposes on the Enterprise edition only.
@@ -10,7 +10,7 @@ retention settings that Microsoft exposes on the Enterprise edition only.
 A single, self-contained `.cmd` file with a graphical interface. No installation, no
 dependencies, no PowerShell modules. Copy it to a USB stick and run it anywhere.
 
-The interface speaks **English, German, Spanish, French and Portuguese**. It starts in
+The interface speaks **English, German, French, Spanish and Portuguese**. It starts in
 whichever one matches your Windows display language; the buttons in the top right switch at
 any time. The window also links to the project and to the
 [short guide](https://henmedia.github.io/windows-pitr-config/guide.html), which opens in the

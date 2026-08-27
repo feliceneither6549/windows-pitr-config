@@ -76,8 +76,8 @@
 <nav class="langbar" id="langbar">
   <button type="button" data-lang="en">EN</button>
   <button type="button" data-lang="de">DE</button>
-  <button type="button" data-lang="es">ES</button>
   <button type="button" data-lang="fr">FR</button>
+  <button type="button" data-lang="es">ES</button>
   <button type="button" data-lang="pt">PT</button>
 </nav>
 
@@ -201,65 +201,6 @@
      Konfiguration.</p>
 </section>
 
-<!-- ============================================================= SPANISH == -->
-<section data-lang="es" hidden>
-  <h1>pitr-config — guía breve</h1>
-  <p class="sub">Configurar Point-in-time restore en Windows 11.</p>
-
-  <h2>Para qué sirve esta herramienta</h2>
-  <p>Windows 11 puede crear instantáneas completas del sistema y devolver el equipo a un
-     estado anterior. Con qué <b>frecuencia</b> lo hace y <b>cuánto tiempo</b> conserva cada
-     instantánea solo puede ajustarse en la edición Enterprise: en las demás, esas dos listas
-     aparecen atenuadas.</p>
-  <p>Esta herramienta las ajusta de todos modos. La restricción está únicamente en la interfaz
-     de Configuración, no en el motor que hay debajo, y ese motor lee su configuración de un
-     lugar en el que la herramienta puede escribir directamente.</p>
-
-  <h2>Primeros pasos</h2>
-  <p>Haga doble clic en <code>pitr-config.cmd</code>. El archivo solicita por sí mismo permisos
-     de administrador y abre una ventana. No se escribe nada hasta que pulse un botón.</p>
-  <p>El idioma se toma del idioma de presentación de Windows; los botones de arriba a la
-     derecha lo cambian en cualquier momento.</p>
-
-  <h2>Los botones</h2>
-  <div class="tablewrap"><table>
-    <tr><th>Aplicar</th><td>Escribe sus ajustes. Una frecuencia nueva surte efecto en la siguiente ejecución de la tarea programada.</td></tr>
-    <tr><th>Aplicar y ejecutar ahora</th><td>Escribe los ajustes y ejecuta la tarea de inmediato, de modo que se crea un punto y el calendario se recalcula al instante.</td></tr>
-    <tr><th>Actualizar</th><td>Vuelve a leer el estado actual.</td></tr>
-    <tr><th>Restablecer todo</th><td>Elimina, tras confirmación, todos los valores escritos por la herramienta. Windows vuelve a sus propios valores predeterminados.</td></tr>
-  </table></div>
-
-  <h2>Los ajustes</h2>
-  <ul>
-    <li><b>Función activada</b> — activa o desactiva Point-in-time restore.</li>
-    <li><b>Frecuencia</b> — de 1 a 24 horas entre puntos de restauración.</li>
-    <li><b>Conservación</b> — de 1 a 7 días antes de que un punto se elimine automáticamente.</li>
-    <li><b>Espacio máximo</b> — de 2 a 50 GB para todos los puntos en conjunto.</li>
-  </ul>
-  <p>Cada lista empieza por <b>Valor predeterminado de Windows</b>, que elimina de nuevo esa
-     sobrescritura concreta. Debajo de cada lista, en gris, se ve el valor actualmente en vigor
-     y de dónde procede.</p>
-
-  <h2>Tres cosas que conviene saber</h2>
-  <div class="note">
-    <p><b>La frecuencia es un intervalo mínimo, no una promesa.</b> Los puntos de restauración
-       solo se crean cuando el sistema está inactivo. Si está usando el equipo, o si está
-       apagado, la ejecución se aplaza y una cita puede omitirse por completo. Configurar una
-       hora en un equipo que se usa todo el día no producirá veinticuatro puntos. La ventana
-       muestra el estado de la tarea para que vea cuándo hay una ejecución en espera.</p>
-    <p><b>Solo se incluye la unidad de Windows.</b> Otras particiones y otros discos quedan
-       fuera, incluso en el mismo disco físico. Los datos que haya allí no se protegen ni se
-       revierten, y siguen necesitando su propia copia de seguridad.</p>
-    <p><b>Esta es una vía no oficial.</b> Los valores de configuración no están documentados
-       por Microsoft. Una versión futura de Windows puede cambiarlos; entonces volverá a
-       aplicarse simplemente el comportamiento normal de Windows.</p>
-  </div>
-
-  <h2>Deshacerlo todo</h2>
-  <p><b>Restablecer todo</b> lo elimina en un solo paso. La herramienta nunca borra puntos de
-     restauración existentes: solo cambia la configuración.</p>
-</section>
-
 <!-- ============================================================== FRENCH == -->
 <section data-lang="fr" hidden>
   <h1>pitr-config — guide rapide</h1>
@@ -319,6 +260,65 @@
   <h2>Tout annuler</h2>
   <p><b>Tout réinitialiser</b> supprime l'ensemble en une seule étape. L'outil ne supprime
      jamais les points de restauration existants : il ne modifie que la configuration.</p>
+</section>
+
+<!-- ============================================================= SPANISH == -->
+<section data-lang="es" hidden>
+  <h1>pitr-config — guía breve</h1>
+  <p class="sub">Configurar Point-in-time restore en Windows 11.</p>
+
+  <h2>Para qué sirve esta herramienta</h2>
+  <p>Windows 11 puede crear instantáneas completas del sistema y devolver el equipo a un
+     estado anterior. Con qué <b>frecuencia</b> lo hace y <b>cuánto tiempo</b> conserva cada
+     instantánea solo puede ajustarse en la edición Enterprise: en las demás, esas dos listas
+     aparecen atenuadas.</p>
+  <p>Esta herramienta las ajusta de todos modos. La restricción está únicamente en la interfaz
+     de Configuración, no en el motor que hay debajo, y ese motor lee su configuración de un
+     lugar en el que la herramienta puede escribir directamente.</p>
+
+  <h2>Primeros pasos</h2>
+  <p>Haga doble clic en <code>pitr-config.cmd</code>. El archivo solicita por sí mismo permisos
+     de administrador y abre una ventana. No se escribe nada hasta que pulse un botón.</p>
+  <p>El idioma se toma del idioma de presentación de Windows; los botones de arriba a la
+     derecha lo cambian en cualquier momento.</p>
+
+  <h2>Los botones</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Aplicar</th><td>Escribe sus ajustes. Una frecuencia nueva surte efecto en la siguiente ejecución de la tarea programada.</td></tr>
+    <tr><th>Aplicar y ejecutar ahora</th><td>Escribe los ajustes y ejecuta la tarea de inmediato, de modo que se crea un punto y el calendario se recalcula al instante.</td></tr>
+    <tr><th>Actualizar</th><td>Vuelve a leer el estado actual.</td></tr>
+    <tr><th>Restablecer todo</th><td>Elimina, tras confirmación, todos los valores escritos por la herramienta. Windows vuelve a sus propios valores predeterminados.</td></tr>
+  </table></div>
+
+  <h2>Los ajustes</h2>
+  <ul>
+    <li><b>Función activada</b> — activa o desactiva Point-in-time restore.</li>
+    <li><b>Frecuencia</b> — de 1 a 24 horas entre puntos de restauración.</li>
+    <li><b>Conservación</b> — de 1 a 7 días antes de que un punto se elimine automáticamente.</li>
+    <li><b>Espacio máximo</b> — de 2 a 50 GB para todos los puntos en conjunto.</li>
+  </ul>
+  <p>Cada lista empieza por <b>Valor predeterminado de Windows</b>, que elimina de nuevo esa
+     sobrescritura concreta. Debajo de cada lista, en gris, se ve el valor actualmente en vigor
+     y de dónde procede.</p>
+
+  <h2>Tres cosas que conviene saber</h2>
+  <div class="note">
+    <p><b>La frecuencia es un intervalo mínimo, no una promesa.</b> Los puntos de restauración
+       solo se crean cuando el sistema está inactivo. Si está usando el equipo, o si está
+       apagado, la ejecución se aplaza y una cita puede omitirse por completo. Configurar una
+       hora en un equipo que se usa todo el día no producirá veinticuatro puntos. La ventana
+       muestra el estado de la tarea para que vea cuándo hay una ejecución en espera.</p>
+    <p><b>Solo se incluye la unidad de Windows.</b> Otras particiones y otros discos quedan
+       fuera, incluso en el mismo disco físico. Los datos que haya allí no se protegen ni se
+       revierten, y siguen necesitando su propia copia de seguridad.</p>
+    <p><b>Esta es una vía no oficial.</b> Los valores de configuración no están documentados
+       por Microsoft. Una versión futura de Windows puede cambiarlos; entonces volverá a
+       aplicarse simplemente el comportamiento normal de Windows.</p>
+  </div>
+
+  <h2>Deshacerlo todo</h2>
+  <p><b>Restablecer todo</b> lo elimina en un solo paso. La herramienta nunca borra puntos de
+     restauración existentes: solo cambia la configuración.</p>
 </section>
 
 <!-- ========================================================== PORTUGUESE == -->
@@ -390,7 +390,7 @@
 </div>
 <script>
 (function () {
-  var CODES = ['en', 'de', 'es', 'fr', 'pt'];
+  var CODES = ['en', 'de', 'fr', 'es', 'pt'];
 
   function pick() {
     var h = (location.hash || '').replace('#', '').toLowerCase();

@@ -8,9 +8,9 @@ Notable changes are recorded here. The format follows
 
 ### Added
 
-- Spanish, French and Portuguese interface translations, alongside the existing English and
+- French, Spanish and Portuguese interface translations, alongside the existing English and
   German. The language is still detected from the Windows display language; the top right now
-  carries one button per language (EN DE ES FR PT) with the active one marked.
+  carries one button per language (EN DE FR ES PT) with the active one marked.
 - A link to the project page and to a short guide in the window header. The guide opens in
   the language currently selected.
 - `docs/guide.html` — a short guide in all five languages in one page, published at
