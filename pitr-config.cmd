@@ -128,7 +128,7 @@ $UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases
 $script:UpdateVersion = $null
 $script:UpdateUrl     = $null
 
-# Linked from the window. The guide carries all five languages in one page and picks
+# Linked from the window. The guide carries all seven languages in one page and picks
 # one from the fragment. A copy of it sitting next to the .cmd wins over the online
 # version, so the tool stays fully usable on a stick without a network.
 $ProjectUrl = 'https://github.com/henmedia/windows-pitr-config'
