@@ -280,6 +280,12 @@ Releases follow `MAJOR.MINOR.PATCH` and are tagged `vX.Y.Z`. The running version
 the window below the headline and printed by `pitr-config.cmd selftest`, so a bug report can
 always name the exact build. What changed between releases is in [CHANGELOG.md](CHANGELOG.md).
 
+## Support
+
+The tool is free and stays that way. If it saved an afternoon of reinstalling Windows, a
+coffee is welcome: [paypal.me/teslapunk](https://www.paypal.me/teslapunk). Nothing in the tool
+itself ever asks for money — no notice, no link, no reminder.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
