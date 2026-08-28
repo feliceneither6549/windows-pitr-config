@@ -4,6 +4,55 @@ Notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] — 2026-08-28
+
+### Added
+
+- **The state of the recovery environment** in the *Current state* box, with the size and free
+  space of the recovery partition. A restore point is applied from that environment, not from
+  inside Windows — if it is switched off, the tool would otherwise collect points that nobody
+  can reach when it matters. The line turns red and explains itself in that case. The state is
+  read from `ReAgent.xml`, not from the translated output of `reagentc /info`, and the
+  partition is found through the disk number and byte offset recorded there.
+- **Restart to recovery** next to that line — reboots straight into the recovery environment,
+  where a point gets applied. Asks first, because it is the only button that restarts the
+  machine. Windows does offer that route, under Settings → System → Recovery → Advanced
+  startup, but several clicks away from anything to do with restore points. README and guide
+  put it right behind *Create snapshot now*: creating a point and reaching the place where it
+  gets applied are two halves of the same thing.
+- **Copy state**, below the log: puts the whole state into the clipboard as plain text, in the
+  language currently selected. Made for a forum post or a bug report.
+- **A command line for scripts**: `pitr-config.cmd apply freq=4h reten=5d size=20g active=on`,
+  plus `reset` and `status`. It writes without opening a window, needs an elevated prompt and
+  deliberately does not elevate itself — elevation would start a new process whose output and
+  exit code never reach the caller. Exit codes: 0 done, 1 bad argument, 5 not elevated. Its
+  output stays English whatever the display language is, and `status` prints the raw level, so
+  scripts have something stable to read.
+- **A plain statement that this is not a backup**, in the window, the README and the guide. The
+  restore points live on the very volume they protect, so a failed disk, a stolen machine or a
+  wiped volume takes them along. Point-in-time restore answers a bad update or a bad driver;
+  hardware failure, theft and ransomware need a backup on separate media. Easy to assume
+  otherwise from a feature that promises to roll the whole system back.
+- Italian and Polish interface translations, alongside English, German, French, Spanish and
+  Portuguese. The guide covers both in full, including the section on creating a snapshot on
+  demand.
+- A discreet support note at the end of the guide, in every language, matching the one in the
+  README. Nothing about it appears in the tool itself.
+- A *Translations* section in the README: how the language table is built, what a new language
+  needs, and the traps worth knowing — doubled ASCII apostrophes, terminology taken from the
+  Windows interface of that language, no forms of address, and plural forms that vary with the
+  number. Corrections to the existing six are wanted more than new languages; German is the
+  only one a native speaker has reviewed.
+
+### Changed
+
+- The language buttons wrap to a second row instead of taking width from the headline. The row
+  keeps the width it had with five buttons; the sixth and later ones move down.
+- Terminology follows the Windows interface of each language rather than a literal translation
+  — *punto di ripristino* and *copia shadow* in Italian, *punkt przywracania* and *kopia w
+  tle* in Polish. Polish hours are abbreviated as `godz.`, because the full word takes a
+  different form depending on the number (2 godziny, 5 godzin) and the interface shows both.
+
 ## [1.4.1] — 2026-08-27
 
 ### Changed

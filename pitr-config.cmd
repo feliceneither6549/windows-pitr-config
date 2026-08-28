@@ -2,8 +2,8 @@
 rem ===========================================================================
 rem  pitr-config.cmd
 rem  Configures Point-in-time restore / Zeitpunktwiederherstellung (Windows 11).
-rem  Five languages: English, German, French, Spanish and Portuguese. The one
-rem  matching the Windows display language is picked automatically.
+rem  Seven languages: English, German, French, Spanish, Portuguese, Italian and
+rem  Polish. The one matching the Windows display language is picked automatically.
 rem
 rem  Single file: the complete PowerShell code sits below the #___PSCODE___
 rem  marker and is loaded from here. Just double-click it; the file requests
@@ -15,6 +15,10 @@ rem  window, no administrator rights, and nothing is written.
 rem
 rem  The argument "noupdate" skips the check for a newer version on start.
 rem
+rem  Running it as "apply" writes settings without a window, for startup scripts:
+rem      pitr-config.cmd apply freq=4h reten=5d size=20g active=on
+rem  It needs an elevated prompt and does not elevate itself - see the note further down.
+rem
 rem  IMPORTANT: this file must stay UTF-8 WITHOUT BOM. A BOM makes cmd.exe
 rem  trip over the very first line. Non-ASCII characters in the PowerShell
 rem  part survive regardless, because the loader reads the file as UTF-8
@@ -23,6 +27,7 @@ rem ===========================================================================
 setlocal
 
 if /i "%~1"=="selftest" goto :selftest
+if /i "%~1"=="apply"    goto :apply
 
 rem  Started from a network share, cmd.exe prints a warning of its own before the first
 rem  line here runs: UNC paths are not supported as the current directory, and it falls
@@ -63,10 +68,31 @@ set "PITR_SELF=%~f0"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$m='#___PSCODE___'; $t=[IO.File]::ReadAllText($env:PITR_SELF,[Text.UTF8Encoding]::new($false)); $sb=[scriptblock]::Create($t.Substring($t.LastIndexOf($m)+$m.Length)); & $sb -SelfTest"
 exit /b
 
+rem  Der Kommandozeilenbetrieb hebt sich bewusst NICHT selbst auf Administratorrechte:
+rem  Die Erhoehung startet einen neuen Prozess mit eigener Konsole, dessen Ausgabe und
+rem  Rueckgabewert im aufrufenden Skript nicht mehr ankommen. Ein Startskript laeuft
+rem  ohnehin erhoeht; alles andere bekommt eine klare Ansage und den Rueckgabewert 5.
+rem
+rem  The command line deliberately does NOT self-elevate: elevation starts a new process
+rem  with its own console, and neither its output nor its exit code would reach the
+rem  caller. A startup script runs elevated anyway; anything else gets a clear message
+rem  and exit code 5.
+:apply
+net session >nul 2>&1
+if not "%errorlevel%"=="0" (
+  echo pitr-config: administrator rights are required for "apply".
+  exit /b 5
+)
+set "PITR_SELF=%~f0"
+set "PITR_ARGS=%*"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$m='#___PSCODE___'; $t=[IO.File]::ReadAllText($env:PITR_SELF,[Text.UTF8Encoding]::new($false)); $sb=[scriptblock]::Create($t.Substring($t.LastIndexOf($m)+$m.Length)); & $sb -Apply -Options $env:PITR_ARGS"
+exit /b %errorlevel%
+
 #___PSCODE___
 <#
     Point-in-time restore (PITR) / Zeitpunktwiederherstellung
-    Graphical configuration tool in EN, DE, FR, ES and PT.
+    Graphical configuration tool in EN, DE, FR, ES, PT, IT and PL.
+    Also drivable from the command line:  pitr-config.cmd apply freq=4h reten=5d
 
     The PITR engine reads its configuration from
         HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\Recovery\PITR\Settings
@@ -88,14 +114,14 @@ exit /b
     PITR.dll and RemoteRemediationCSP.dll and verified in practice.
 #>
 
-param([switch]$SelfTest)
+param([switch]$SelfTest, [switch]$Apply, [string]$Options = '')
 
 $ErrorActionPreference = 'Stop'
 
 # The one place the version is defined. It appears under the headline in the window
 # and in the selftest; a release is tagged with "v" followed by this value. Keeping
 # it out of the batch header above avoids having two numbers that can drift apart.
-$Version  = '1.4.1'
+$Version  = '1.5.0'
 
 # Asked on start unless PITR_NOUPDATE is set. Returns the newest release of the project.
 $UpdateApi = 'https://api.github.com/repos/henmedia/windows-pitr-config/releases/latest'
@@ -183,7 +209,7 @@ en = @{
     tipStore   = 'In use = data actually written by shadow copies.' + [Environment]::NewLine +
                  'Reserved = space VSS has already claimed on disk. It is no longer available to other files but is not yet fully filled.' + [Environment]::NewLine +
                  'Limit = configured ceiling; the area never grows beyond it.'
-    noteVolume = 'Only the Windows drive {0} is covered. Other partitions and other disks are left out - even when they sit on the same physical disk. They are neither captured nor rolled back during a restore, so data there still needs a backup of its own. The storage limit below likewise applies to {0} alone.'
+    noteVolume = 'Only the Windows drive {0} is covered. Other partitions and other disks are left out - even when they sit on the same physical disk. They are neither captured nor rolled back during a restore, so data there still needs a backup of its own. The storage limit below likewise applies to {0} alone. The points also sit on the very drive they protect: a failed disk takes them with it. Point-in-time restore answers a bad update or a bad driver, not hardware failure, theft or ransomware - it is no substitute for a backup.'
 
     colTime    = 'Time'
     colAge     = 'Age'
@@ -250,6 +276,21 @@ en = @{
     logError   = 'Error'
     askReset   = 'Remove every value set by this tool and return to the Windows default?'
     askResetT  = 'Reset'
+    capWinRE   = 'Recovery environment:'
+    winreOn    = 'available'
+    winreOff   = 'switched off'
+    winreUnk   = 'not determinable'
+    winreFree  = 'free'
+    noteWinRE  = 'Without the recovery environment no restore point can be applied - the rollback runs from there, not from inside Windows. An elevated "reagentc /enable" usually puts it back.'
+    btnWinRE   = 'Restart to recovery'
+    tipWinRE   = 'Restarts Windows into the recovery environment, where a restore point can be applied. Unsaved work in other programs is lost.'
+    askWinRE   = 'Restart into the recovery environment now? Unsaved work in other programs will be lost.'
+    askWinRET  = 'Restart'
+    logWinRE   = 'Restarting into the recovery environment...'
+    btnCopy    = 'Copy state'
+    copyHint   = 'Copies edition, settings with their source, task status and restore points as text - for a forum post or a bug report.'
+    tipCopy    = 'Copies the current state to the clipboard as plain text - edition, settings with their source, task status, restore points and storage. Made for a forum post or a bug report.'
+    logCopied  = 'State copied to the clipboard.'
 }
 
 # ------------------------------------------------------------------ German --
@@ -292,7 +333,7 @@ de = @{
     tipStore   = 'Belegt = tatsächlich von Schattenkopien beschriebene Daten.' + [Environment]::NewLine +
                  'Reserviert = Platz, den VSS bereits auf der Platte abgesteckt hat. Er steht anderen Dateien nicht mehr zur Verfügung, ist aber noch nicht vollständig gefüllt.' + [Environment]::NewLine +
                  'Grenze = konfigurierte Obergrenze; darüber hinaus wächst der Bereich nicht.'
-    noteVolume = 'Erfasst wird ausschließlich das Windows-Laufwerk {0}. Weitere Partitionen und weitere Festplatten bleiben außen vor — auch wenn sie auf derselben physischen Platte liegen. Sie werden weder gesichert noch bei einer Wiederherstellung zurückgesetzt; für Daten dort ist weiterhin eine eigene Sicherung nötig. Auch die Speichergrenze weiter unten gilt allein für {0}.'
+    noteVolume = 'Erfasst wird ausschließlich das Windows-Laufwerk {0}. Weitere Partitionen und weitere Festplatten bleiben außen vor — auch wenn sie auf derselben physischen Platte liegen. Sie werden weder gesichert noch bei einer Wiederherstellung zurückgesetzt; für Daten dort ist weiterhin eine eigene Sicherung nötig. Auch die Speichergrenze weiter unten gilt allein für {0}. Die Punkte liegen zudem auf genau dem Laufwerk, das sie schützen: Eine defekte Platte nimmt sie mit. Die Zeitpunktwiederherstellung ist die Antwort auf ein missglücktes Update oder einen fehlerhaften Treiber, nicht auf Hardwaredefekt, Diebstahl oder Verschlüsselungstrojaner - eine Sicherung ersetzt sie nicht.'
 
     colTime    = 'Zeitpunkt'
     colAge     = 'Alter'
@@ -359,6 +400,21 @@ de = @{
     logError   = 'Fehler'
     askReset   = 'Alle von diesem Werkzeug gesetzten Werte entfernen und zum Windows-Standard zurückkehren?'
     askResetT  = 'Zurücksetzen'
+    capWinRE   = 'Wiederherstellungsumgebung:'
+    winreOn    = 'vorhanden'
+    winreOff   = 'abgeschaltet'
+    winreUnk   = 'nicht ermittelbar'
+    winreFree  = 'frei'
+    noteWinRE  = 'Ohne Wiederherstellungsumgebung lässt sich kein Wiederherstellungspunkt anwenden - das Zurückrollen läuft von dort und nicht aus Windows heraus. Ein „reagentc /enable“ mit Administratorrechten stellt sie meist wieder her.'
+    btnWinRE   = 'Neustart zur Wiederherstellung'
+    tipWinRE   = 'Startet Windows in die Wiederherstellungsumgebung, in der sich ein Wiederherstellungspunkt anwenden lässt. Nicht Gespeichertes in anderen Programmen geht verloren.'
+    askWinRE   = 'Jetzt in die Wiederherstellungsumgebung neu starten? Nicht gespeicherte Arbeit in anderen Programmen geht verloren.'
+    askWinRET  = 'Neustart'
+    logWinRE   = 'Neustart in die Wiederherstellungsumgebung...'
+    btnCopy    = 'Zustand kopieren'
+    copyHint   = 'Kopiert Edition, Einstellungen samt Quelle, Aufgabenstatus und Wiederherstellungspunkte als Text - für einen Forenbeitrag oder eine Fehlermeldung.'
+    tipCopy    = 'Kopiert den aktuellen Zustand als Klartext in die Zwischenablage - Edition, Einstellungen samt Quelle, Aufgabenstatus, Wiederherstellungspunkte und Speicher. Gemacht für einen Forenbeitrag oder eine Fehlermeldung.'
+    logCopied  = 'Zustand in die Zwischenablage kopiert.'
 }
 
 # ------------------------------------------------------------------ French --
@@ -403,7 +459,7 @@ fr = @{
     tipStore   = 'Utilisé = données réellement écrites par les clichés instantanés.' + [Environment]::NewLine +
                  'Réservé = espace que VSS a déjà réservé sur le disque. Il n''est plus disponible pour d''autres fichiers, mais il n''est pas encore rempli.' + [Environment]::NewLine +
                  'Limite = plafond configuré ; la zone ne dépasse jamais cette valeur.'
-    noteVolume = 'Seul le lecteur Windows {0} est pris en compte. Les autres partitions et les autres disques sont exclus — même s''ils se trouvent sur le même disque physique. Ils ne sont ni capturés ni restaurés, les données qui s''y trouvent ont donc toujours besoin de leur propre sauvegarde. La limite de stockage ci-dessous s''applique elle aussi uniquement à {0}.'
+    noteVolume = 'Seul le lecteur Windows {0} est pris en compte. Les autres partitions et les autres disques sont exclus — même s''ils se trouvent sur le même disque physique. Ils ne sont ni capturés ni restaurés, les données qui s''y trouvent ont donc toujours besoin de leur propre sauvegarde. La limite de stockage ci-dessous s''applique elle aussi uniquement à {0}. Les points se trouvent de plus sur le disque même qu''ils protègent : un disque défaillant les emporte. La restauration à un instant donné répond à une mise à jour ratée ou à un pilote défectueux, pas à une panne matérielle, un vol ou un rançongiciel - elle ne remplace pas une sauvegarde.'
 
     colTime    = 'Date et heure'
     colAge     = 'Âge'
@@ -470,6 +526,21 @@ fr = @{
     logError   = 'Erreur'
     askReset   = 'Supprimer toutes les valeurs définies par cet outil et revenir à la valeur par défaut de Windows ?'
     askResetT  = 'Réinitialiser'
+    capWinRE   = 'Environnement de récupération :'
+    winreOn    = 'présent'
+    winreOff   = 'désactivé'
+    winreUnk   = 'indéterminable'
+    winreFree  = 'libres'
+    noteWinRE  = 'Sans environnement de récupération, aucun point de restauration ne peut être appliqué : la restauration s''exécute depuis cet environnement, pas depuis Windows. Un « reagentc /enable » avec des droits d''administrateur le rétablit en général.'
+    btnWinRE   = 'Redémarrer vers la récupération'
+    tipWinRE   = 'Redémarre Windows dans l''environnement de récupération, où un point de restauration peut être appliqué. Le travail non enregistré dans les autres programmes est perdu.'
+    askWinRE   = 'Redémarrer maintenant dans l''environnement de récupération ? Le travail non enregistré dans les autres programmes sera perdu.'
+    askWinRET  = 'Redémarrage'
+    logWinRE   = 'Redémarrage dans l''environnement de récupération...'
+    btnCopy    = 'Copier l''état'
+    copyHint   = 'Copie l''édition, les réglages avec leur source, l''état de la tâche et les points de restauration en texte - pour un message de forum ou un rapport d''erreur.'
+    tipCopy    = 'Copie l''état actuel en texte brut dans le presse-papiers : édition, réglages avec leur source, état de la tâche, points de restauration et stockage. Prévu pour un message de forum ou un rapport d''erreur.'
+    logCopied  = 'État copié dans le presse-papiers.'
 }
 
 # ----------------------------------------------------------------- Spanish --
@@ -510,7 +581,7 @@ es = @{
     tipStore   = 'En uso = datos realmente escritos por las instantáneas.' + [Environment]::NewLine +
                  'Reservado = espacio que VSS ya ha reclamado en el disco. Deja de estar disponible para otros archivos, pero todavía no está lleno.' + [Environment]::NewLine +
                  'Límite = tope configurado; el área no crece más allá.'
-    noteVolume = 'Solo se incluye la unidad de Windows {0}. Otras particiones y otros discos quedan fuera — incluso si están en el mismo disco físico. No se capturan ni se revierten en una restauración, así que los datos que haya allí siguen necesitando su propia copia de seguridad. El límite de almacenamiento de abajo también se aplica únicamente a {0}.'
+    noteVolume = 'Solo se incluye la unidad de Windows {0}. Otras particiones y otros discos quedan fuera — incluso si están en el mismo disco físico. No se capturan ni se revierten en una restauración, así que los datos que haya allí siguen necesitando su propia copia de seguridad. El límite de almacenamiento de abajo también se aplica únicamente a {0}. Además, los puntos están en la misma unidad que protegen: un disco averiado se los lleva. La restauración a un momento anterior responde a una actualización fallida o a un controlador defectuoso, no a una avería de hardware, un robo o un ransomware: no sustituye a una copia de seguridad.'
 
     colTime    = 'Fecha y hora'
     colAge     = 'Antigüedad'
@@ -577,6 +648,21 @@ es = @{
     logError   = 'Error'
     askReset   = '¿Eliminar todos los valores establecidos por esta herramienta y volver al valor predeterminado de Windows?'
     askResetT  = 'Restablecer'
+    capWinRE   = 'Entorno de recuperación:'
+    winreOn    = 'presente'
+    winreOff   = 'desactivado'
+    winreUnk   = 'no determinable'
+    winreFree  = 'libres'
+    noteWinRE  = 'Sin el entorno de recuperación no se puede aplicar ningún punto de restauración: la reversión se ejecuta desde ahí, no desde dentro de Windows. Un «reagentc /enable» con derechos de administrador suele restablecerlo.'
+    btnWinRE   = 'Reiniciar a recuperación'
+    tipWinRE   = 'Reinicia Windows en el entorno de recuperación, donde se puede aplicar un punto de restauración. El trabajo sin guardar en otros programas se pierde.'
+    askWinRE   = '¿Reiniciar ahora en el entorno de recuperación? El trabajo sin guardar en otros programas se perderá.'
+    askWinRET  = 'Reinicio'
+    logWinRE   = 'Reiniciando en el entorno de recuperación...'
+    btnCopy    = 'Copiar el estado'
+    copyHint   = 'Copia la edición, los ajustes con su origen, el estado de la tarea y los puntos de restauración como texto: para un mensaje de foro o un informe de error.'
+    tipCopy    = 'Copia el estado actual como texto sin formato al portapapeles: edición, ajustes con su origen, estado de la tarea, puntos de restauración y almacenamiento. Pensado para un mensaje de foro o un informe de error.'
+    logCopied  = 'Estado copiado al portapapeles.'
 }
 
 # -------------------------------------------------------------- Portuguese --
@@ -617,7 +703,7 @@ pt = @{
     tipStore   = 'Em uso = dados realmente gravados pelas cópias de sombra.' + [Environment]::NewLine +
                  'Reservado = espaço que o VSS já reservou no disco. Ele deixa de estar disponível para outros arquivos, mas ainda não está preenchido.' + [Environment]::NewLine +
                  'Limite = teto configurado; a área nunca cresce além dele.'
-    noteVolume = 'Apenas a unidade do Windows {0} é incluída. Outras partições e outros discos ficam de fora — mesmo quando estão no mesmo disco físico. Eles não são capturados nem revertidos em uma restauração, então os dados ali continuam precisando do próprio backup. O limite de armazenamento abaixo também vale somente para {0}.'
+    noteVolume = 'Apenas a unidade do Windows {0} é incluída. Outras partições e outros discos ficam de fora — mesmo quando estão no mesmo disco físico. Eles não são capturados nem revertidos em uma restauração, então os dados ali continuam precisando do próprio backup. O limite de armazenamento abaixo também vale somente para {0}. Além disso, os pontos ficam na mesma unidade que protegem: um disco com defeito os leva junto. A restauração a um ponto no tempo responde a uma atualização malsucedida ou a um driver defeituoso, não a uma falha de hardware, roubo ou ransomware - ela não substitui um backup.'
 
     colTime    = 'Data e hora'
     colAge     = 'Idade'
@@ -684,12 +770,275 @@ pt = @{
     logError   = 'Erro'
     askReset   = 'Remover todos os valores definidos por esta ferramenta e voltar ao padrão do Windows?'
     askResetT  = 'Redefinir'
+    capWinRE   = 'Ambiente de recuperação:'
+    winreOn    = 'presente'
+    winreOff   = 'desativado'
+    winreUnk   = 'não determinável'
+    winreFree  = 'livres'
+    noteWinRE  = 'Sem o ambiente de recuperação nenhum ponto de restauração pode ser aplicado: a reversão é executada a partir dele, não de dentro do Windows. Um "reagentc /enable" com direitos de administrador costuma restabelecê-lo.'
+    btnWinRE   = 'Reiniciar para a recuperação'
+    tipWinRE   = 'Reinicia o Windows no ambiente de recuperação, onde um ponto de restauração pode ser aplicado. O trabalho não salvo em outros programas é perdido.'
+    askWinRE   = 'Reiniciar agora no ambiente de recuperação? O trabalho não salvo em outros programas será perdido.'
+    askWinRET  = 'Reinício'
+    logWinRE   = 'Reiniciando no ambiente de recuperação...'
+    btnCopy    = 'Copiar o estado'
+    copyHint   = 'Copia a edição, as configurações com a origem, o status da tarefa e os pontos de restauração como texto - para uma mensagem de fórum ou um relato de erro.'
+    tipCopy    = 'Copia o estado atual como texto simples para a área de transferência: edição, configurações com a origem, status da tarefa, pontos de restauração e armazenamento. Feito para uma mensagem de fórum ou um relato de erro.'
+    logCopied  = 'Estado copiado para a área de transferência.'
+}
+
+# ----------------------------------------------------------------- Italian --
+# Apostrophes here are plain ASCII and doubled - see the note on the French block.
+it = @{
+    winTitle   = 'Point-in-time restore'
+    headline   = 'Point-in-time restore'
+    subtitle   = 'Ripristino a un punto nel tempo (PITR)'
+    intro      = 'Windows offre frequenza e conservazione solo nell''edizione Enterprise. Questo strumento le scrive direttamente nella configurazione del motore PITR, che non verifica l''edizione.'
+    lnkGuide   = 'Guida'
+    tipProject = 'Apre la pagina del progetto su GitHub'
+    tipGuide   = 'Apre la guida rapida nel browser'
+    updAvail   = 'La versione {0} è disponibile - aprire la pagina della versione'
+    tipUpdate  = 'Apre la pagina di download nel browser. Nulla viene scaricato o installato automaticamente.'
+
+    grpState   = 'Stato attuale'
+    capEdition = 'Edizione di Windows:'
+    capLast    = 'Ultima esecuzione:'
+    capNext    = 'Prossima esecuzione:'
+    capDelta   = 'Intervallo pianificato:'
+    capTaskSt  = 'Stato dell''attività:'
+    tsReady    = 'pronta'
+    tsQueued   = 'in attesa che il sistema sia inattivo'
+    tsRunning  = 'in esecuzione'
+    tsDisabled = 'disattivata'
+    tsOverdue  = 'in ritardo di'
+    missedRuns = 'esecuzioni saltate: {0}'
+    noteIdle   = 'I punti di ripristino vengono creati solo quando il sistema è inattivo. Se il computer è in uso o spento, l''esecuzione viene rinviata - e un appuntamento pianificato può saltare del tutto. La frequenza impostata è quindi un intervallo minimo, non una garanzia. Con «Crea subito un''istantanea», in alto, si può forzare un punto in qualsiasi momento.'
+
+    grpPoints  = 'Punti di ripristino'
+    lblCount   = 'Numero'
+    lblOldest  = 'Punto più vecchio'
+    lblStorage = 'Spazio sull''unità'
+    stUsed     = 'in uso'
+    stAlloc    = 'riservato'
+    stMax      = 'limite'
+    stNoAdmin  = 'non disponibile (sono necessari i diritti di amministratore)'
+    noteStore  = 'Windows indica lo spazio solo per unità, mai per singolo punto - tutti i punti condividono una sola area comune di differenze.'
+    tipStore   = 'In uso = dati effettivamente scritti dalle copie shadow.' + [Environment]::NewLine +
+                 'Riservato = spazio che il servizio VSS ha già occupato sul disco. Non è più disponibile per altri file, ma non è ancora del tutto riempito.' + [Environment]::NewLine +
+                 'Limite = tetto massimo configurato; l''area non cresce mai oltre.'
+    noteVolume = 'Viene protetta solo l''unità di Windows {0}. Le altre partizioni e gli altri dischi restano esclusi - anche quando si trovano sullo stesso disco fisico. Non vengono né acquisiti né ripristinati, quindi i dati che vi si trovano hanno bisogno di un backup proprio. Anche il limite di spazio qui sotto vale solo per {0}. I punti si trovano inoltre sull''unità stessa che proteggono: un disco guasto se li porta via. Il ripristino a un punto nel tempo risponde a un aggiornamento mal riuscito o a un driver difettoso, non a un guasto hardware, a un furto o a un ransomware: non sostituisce un backup.'
+
+    colTime    = 'Data e ora'
+    colAge     = 'Età'
+    colStatus  = 'Stato'
+    colBuild   = 'Build'
+    stShadowOk = 'copia shadow presente'
+    stRegOnly  = 'solo voce di registro'
+    stUnknown  = 'sconosciuto (servono diritti di amministratore)'
+
+    grpSet     = 'Impostazioni'
+    capActive  = 'Funzione attivata'
+    capFreq    = 'Frequenza - intervallo tra i punti di ripristino'
+    capReten   = 'Conservazione - durata di un punto di ripristino'
+    capSize    = 'Spazio massimo per tutti i punti di ripristino'
+
+    optNoOver  = 'Impostazione predefinita di Windows (non modificare)'
+    optOn      = 'Attivata'
+    optOff     = 'Disattivata'
+    optStdFreq = 'Impostazione predefinita di Windows (24 ore)'
+    optStdRet  = 'Impostazione predefinita di Windows (3 giorni / 72 ore)'
+    unitHour   = 'ora'
+    unitHours  = 'ore'
+    unitDay    = 'giorno'
+    unitDays   = 'giorni'
+    unitMin    = 'minuti'
+
+    btnReset   = 'Reimposta tutto'
+    btnRefresh = 'Aggiorna'
+    btnApply   = 'Applica'
+    btnApplyNow= 'Applica ed esegui subito'
+    btnSnapNow = 'Crea subito un''istantanea'
+    snapHint   = 'Crea subito un punto di ripristino, indipendentemente dalla pianificazione. Le impostazioni qui sotto restano invariate.'
+    tipSnapNow = 'Esegue PITRTask una volta, anche mentre il computer è in uso. Nella configurazione non viene scritto nulla.'
+    grpLog     = 'Registro'
+
+    effective  = 'Attualmente in vigore'
+    source     = 'origine'
+    winDefault = 'impostazione predefinita di Windows'
+    srcGPO     = 'criterio (questo strumento)'
+    srcCSP     = 'Intune/MDM'
+    srcUX      = 'app Impostazioni'
+    sizeStd    = 'impostazione predefinita di Windows (2% del disco)'
+
+    carryOver  = 'deriva ancora dall''impostazione precedente; alla prossima esecuzione verrà portato a'
+    proven72   = 'più vecchio di 72 ore: la conservazione estesa funziona in modo dimostrabile'
+    unofficial = 'Soluzione non ufficiale: i valori di configurazione scritti qui non sono documentati da Microsoft e possono cambiare con le future versioni di Windows. «Reimposta tutto» ripristina in qualsiasi momento l''impostazione predefinita di Windows.'
+    taskMissing= 'PITRTask non trovata'
+    unknownTxt = 'sconosciuto'
+
+    logReady   = 'Pronto. I valori vengono scritti a livello di criterio e hanno la precedenza sull''app Impostazioni.'
+    logNoAdmin = 'ATTENZIONE: senza diritti di amministratore non è possibile salvare alcun valore.'
+    logRefresh = 'Vista aggiornata.'
+    logSaved   = 'Salvato. Ha effetto alla prossima esecuzione di PITRTask (che avviene solo a sistema inattivo).'
+    logCleared = 'modifica rimossa -> impostazione predefinita di Windows'
+    logIdleOff = 'Condizione di inattività temporaneamente sospesa.'
+    logStarted = 'PITRTask avviata, in attesa del completamento...'
+    logIdleOn  = 'Condizione di inattività ripristinata.'
+    logIdleErr = 'Condizione di inattività ripristinata dopo un errore.'
+    logIdleBad = 'ATTENZIONE: non è stato possibile ripristinare la condizione di inattività!'
+    logDone    = 'Fatto. Risultato'
+    logNextRun = 'prossima esecuzione'
+    logRemoved = 'rimosso'
+    logNothing = 'Nessun valore era impostato.'
+    logError   = 'Errore'
+    askReset   = 'Rimuovere tutti i valori impostati da questo strumento e tornare all''impostazione predefinita di Windows?'
+    askResetT  = 'Reimposta'
+    capWinRE   = 'Ambiente di ripristino:'
+    winreOn    = 'presente'
+    winreOff   = 'disattivato'
+    winreUnk   = 'non determinabile'
+    winreFree  = 'liberi'
+    noteWinRE  = 'Senza l''ambiente di ripristino nessun punto di ripristino può essere applicato: il ripristino viene eseguito da lì, non da dentro Windows. Un «reagentc /enable» con diritti di amministratore di solito lo ristabilisce.'
+    btnWinRE   = 'Riavvia al ripristino'
+    tipWinRE   = 'Riavvia Windows nell''ambiente di ripristino, dove è possibile applicare un punto di ripristino. Il lavoro non salvato negli altri programmi va perso.'
+    askWinRE   = 'Riavviare ora nell''ambiente di ripristino? Il lavoro non salvato negli altri programmi andrà perso.'
+    askWinRET  = 'Riavvio'
+    logWinRE   = 'Riavvio nell''ambiente di ripristino...'
+    btnCopy    = 'Copia lo stato'
+    copyHint   = 'Copia edizione, impostazioni con la loro origine, stato dell''attività e punti di ripristino come testo - per un messaggio in un forum o una segnalazione.'
+    tipCopy    = 'Copia lo stato attuale negli appunti come testo semplice: edizione, impostazioni con la loro origine, stato dell''attività, punti di ripristino e spazio. Pensato per un messaggio in un forum o una segnalazione.'
+    logCopied  = 'Stato copiato negli appunti.'
+}
+# ------------------------------------------------------------------ Polish --
+# "godz." statt "godziny"/"godzin": Polnisch verlangt je nach Zahl eine andere Form
+# (2 godziny, aber 5 godzin), und die Oberflaeche kennt beide Faelle. Die Abkuerzung
+# ist unveraenderlich und in Windows selbst ueblich, damit stimmt jede Zahl. Bei
+# Tagen genuegen zwei Formen, dzien und dni, die decken alles ab.
+pl = @{
+    winTitle   = 'Point-in-time restore'
+    headline   = 'Point-in-time restore'
+    subtitle   = 'Przywracanie do punktu w czasie (PITR)'
+    intro      = 'Windows udostępnia częstotliwość i czas przechowywania tylko w edycji Enterprise. To narzędzie zapisuje je bezpośrednio w konfiguracji mechanizmu PITR, który nie sprawdza edycji.'
+    lnkGuide   = 'Przewodnik'
+    tipProject = 'Otwiera stronę projektu w serwisie GitHub'
+    tipGuide   = 'Otwiera krótki przewodnik w przeglądarce'
+    updAvail   = 'Dostępna jest wersja {0} - strona wydania'
+    tipUpdate  = 'Otwiera stronę pobierania w przeglądarce. Nic nie jest pobierane ani instalowane automatycznie.'
+
+    grpState   = 'Stan bieżący'
+    capEdition = 'Edycja systemu Windows:'
+    capLast    = 'Ostatnie uruchomienie:'
+    capNext    = 'Następne uruchomienie:'
+    capDelta   = 'Zaplanowany odstęp:'
+    capTaskSt  = 'Stan zadania:'
+    tsReady    = 'gotowe'
+    tsQueued   = 'oczekiwanie na bezczynność systemu'
+    tsRunning  = 'trwa wykonywanie'
+    tsDisabled = 'wyłączone'
+    tsOverdue  = 'opóźnione o'
+    missedRuns = 'pominięte uruchomienia: {0}'
+    noteIdle   = 'Punkty przywracania powstają tylko wtedy, gdy system jest bezczynny. Gdy komputer jest używany lub wyłączony, uruchomienie zostaje przesunięte - a zaplanowany termin może zostać pominięty w całości. Ustawiona częstotliwość jest więc najmniejszym możliwym odstępem, a nie gwarancją. Przycisk „Utwórz migawkę teraz” u góry pozwala wymusić punkt w dowolnej chwili.'
+
+    grpPoints  = 'Punkty przywracania'
+    lblCount   = 'Liczba'
+    lblOldest  = 'Najstarszy punkt'
+    lblStorage = 'Miejsce na dysku'
+    stUsed     = 'w użyciu'
+    stAlloc    = 'zarezerwowane'
+    stMax      = 'limit'
+    stNoAdmin  = 'niedostępne (wymagane uprawnienia administratora)'
+    noteStore  = 'Windows podaje zajętość tylko dla całego dysku, nigdy dla pojedynczego punktu - wszystkie punkty korzystają ze wspólnego obszaru różnicowego.'
+    tipStore   = 'W użyciu = dane rzeczywiście zapisane przez kopie w tle.' + [Environment]::NewLine +
+                 'Zarezerwowane = miejsce już zajęte na dysku przez usługę VSS. Nie jest dostępne dla innych plików, ale nie jest jeszcze w pełni wypełnione.' + [Environment]::NewLine +
+                 'Limit = skonfigurowany pułap; obszar nigdy nie rośnie ponad niego.'
+    noteVolume = 'Obejmowany jest wyłącznie dysk systemu Windows {0}. Pozostałe partycje i inne dyski pozostają poza zakresem - również wtedy, gdy znajdują się na tym samym dysku fizycznym. Nie są ani zapisywane, ani przywracane, więc dane na nich nadal wymagają własnej kopii zapasowej. Limit miejsca poniżej również dotyczy wyłącznie {0}. Punkty znajdują się przy tym na tym samym dysku, który chronią: uszkodzony dysk zabiera je ze sobą. Przywracanie do punktu w czasie jest odpowiedzią na nieudaną aktualizację lub wadliwy sterownik, a nie na awarię sprzętu, kradzież czy ransomware - nie zastępuje kopii zapasowej.'
+
+    colTime    = 'Data i godzina'
+    colAge     = 'Wiek'
+    colStatus  = 'Stan'
+    colBuild   = 'Kompilacja'
+    stShadowOk = 'kopia w tle istnieje'
+    stRegOnly  = 'tylko wpis w rejestrze'
+    stUnknown  = 'nieznany (wymagane uprawnienia administratora)'
+
+    grpSet     = 'Ustawienia'
+    capActive  = 'Funkcja włączona'
+    capFreq    = 'Częstotliwość - odstęp między punktami przywracania'
+    capReten   = 'Czas przechowywania - okres życia punktu przywracania'
+    capSize    = 'Maksymalne miejsce dla wszystkich punktów przywracania'
+
+    optNoOver  = 'Ustawienie domyślne systemu Windows (bez zmiany)'
+    optOn      = 'Włączona'
+    optOff     = 'Wyłączona'
+    optStdFreq = 'Ustawienie domyślne systemu Windows (24 godz.)'
+    optStdRet  = 'Ustawienie domyślne systemu Windows (3 dni / 72 godz.)'
+    unitHour   = 'godz.'
+    unitHours  = 'godz.'
+    unitDay    = 'dzień'
+    unitDays   = 'dni'
+    unitMin    = 'min'
+
+    btnReset   = 'Resetuj wszystko'
+    btnRefresh = 'Odśwież'
+    btnApply   = 'Zastosuj'
+    btnApplyNow= 'Zastosuj i uruchom teraz'
+    btnSnapNow = 'Utwórz migawkę teraz'
+    snapHint   = 'Tworzy punkt przywracania od razu, niezależnie od harmonogramu. Ustawienia poniżej pozostają bez zmian.'
+    tipSnapNow = 'Uruchamia PITRTask jeden raz, także wtedy, gdy komputer jest używany. W konfiguracji nic nie zostaje zapisane.'
+    grpLog     = 'Dziennik'
+
+    effective  = 'Obecnie obowiązuje'
+    source     = 'źródło'
+    winDefault = 'ustawienie domyślne systemu Windows'
+    srcGPO     = 'zasada (to narzędzie)'
+    srcCSP     = 'Intune/MDM'
+    srcUX      = 'aplikacja Ustawienia'
+    sizeStd    = 'ustawienie domyślne systemu Windows (2% dysku)'
+
+    carryOver  = 'nadal pochodzi z poprzedniego ustawienia; przy następnym uruchomieniu zostanie zmieniony na'
+    proven72   = 'starszy niż 72 godziny: wydłużony czas przechowywania działa w praktyce'
+    unofficial = 'Rozwiązanie nieoficjalne: zapisywane tutaj wartości konfiguracyjne nie są udokumentowane przez firmę Microsoft i mogą ulec zmianie w przyszłych wersjach systemu Windows. „Resetuj wszystko” w każdej chwili przywraca ustawienie domyślne systemu Windows.'
+    taskMissing= 'Nie znaleziono zadania PITRTask'
+    unknownTxt = 'nieznany'
+
+    logReady   = 'Gotowe. Wartości są zapisywane na poziomie zasad i mają pierwszeństwo przed aplikacją Ustawienia.'
+    logNoAdmin = 'UWAGA: bez uprawnień administratora nie można zapisać żadnych wartości.'
+    logRefresh = 'Widok odświeżony.'
+    logSaved   = 'Zapisano. Zaczyna obowiązywać przy następnym uruchomieniu PITRTask (następuje ono tylko przy bezczynnym systemie).'
+    logCleared = 'zmiana usunięta -> ustawienie domyślne systemu Windows'
+    logIdleOff = 'Warunek bezczynności tymczasowo zniesiony.'
+    logStarted = 'Uruchomiono PITRTask, oczekiwanie na zakończenie...'
+    logIdleOn  = 'Warunek bezczynności przywrócony.'
+    logIdleErr = 'Warunek bezczynności przywrócony po błędzie.'
+    logIdleBad = 'UWAGA: nie udało się przywrócić warunku bezczynności!'
+    logDone    = 'Gotowe. Wynik'
+    logNextRun = 'następne uruchomienie'
+    logRemoved = 'usunięto'
+    logNothing = 'Żadne wartości nie były ustawione.'
+    logError   = 'Błąd'
+    askReset   = 'Usunąć wszystkie wartości ustawione przez to narzędzie i wrócić do ustawienia domyślnego systemu Windows?'
+    askResetT  = 'Resetowanie'
+    capWinRE   = 'Środowisko odzyskiwania:'
+    winreOn    = 'dostępne'
+    winreOff   = 'wyłączone'
+    winreUnk   = 'nie do ustalenia'
+    winreFree  = 'wolne'
+    noteWinRE  = 'Bez środowiska odzyskiwania nie da się zastosować żadnego punktu przywracania - cofnięcie odbywa się właśnie stamtąd, a nie z poziomu systemu Windows. Polecenie „reagentc /enable” z uprawnieniami administratora zwykle je przywraca.'
+    btnWinRE   = 'Uruchom ponownie do odzyskiwania'
+    tipWinRE   = 'Uruchamia system Windows ponownie w środowisku odzyskiwania, gdzie można zastosować punkt przywracania. Niezapisana praca w innych programach zostanie utracona.'
+    askWinRE   = 'Uruchomić ponownie w środowisku odzyskiwania? Niezapisana praca w innych programach zostanie utracona.'
+    askWinRET  = 'Ponowne uruchomienie'
+    logWinRE   = 'Ponowne uruchamianie w środowisku odzyskiwania...'
+    btnCopy    = 'Kopiuj stan'
+    copyHint   = 'Kopiuje edycję, ustawienia wraz ze źródłem, stan zadania i punkty przywracania jako tekst - do wpisu na forum lub zgłoszenia błędu.'
+    tipCopy    = 'Kopiuje bieżący stan do schowka jako zwykły tekst: edycja, ustawienia wraz ze źródłem, stan zadania, punkty przywracania i miejsce. Pomyślane o wpisie na forum lub zgłoszeniu błędu.'
+    logCopied  = 'Stan skopiowany do schowka.'
 }
 
 }
 
 # Order of the language buttons, and at the same time the list of supported codes.
-$LangCodes = @('en', 'de', 'fr', 'es', 'pt')
+$LangCodes = @('en', 'de', 'fr', 'es', 'pt', 'it', 'pl')
 
 # English steps in for anything a translation is missing, so a half-finished language
 # block degrades to a mixed interface instead of empty labels.
@@ -837,6 +1186,51 @@ function Get-ShadowStorage {
     return $null
 }
 
+# Ein PITR-Punkt wird aus der Wiederherstellungsumgebung heraus angewendet, nicht aus
+# Windows. Ist die abgeschaltet - nach missglueckten Updates keine Seltenheit, siehe
+# KB5034441 -, sammelt das Werkzeug Punkte, an die im Ernstfall niemand herankommt.
+# Gelesen wird ReAgent.xml und nicht die Ausgabe von "reagentc /info": die ist
+# uebersetzt und damit in sieben Sprachen verschieden, die Datei ist es nicht.
+# InstallState 1 = eingerichtet. Faellt irgendetwas davon aus, gibt es $null und die
+# Oberflaeche schreibt "nicht ermittelbar" - lieber keine Aussage als eine falsche.
+function Get-WinReState {
+    $file = Join-Path $env:SystemRoot 'System32\Recovery\ReAgent.xml'
+    try {
+        if (-not (Test-Path -LiteralPath $file)) { return $null }
+        $cfg = ([xml](Get-Content -LiteralPath $file -Raw -ErrorAction Stop)).WindowsRE
+        if ($null -eq $cfg) { return $null }
+
+        $state = $null
+        if ($null -ne $cfg.InstallState) { $state = [string]$cfg.InstallState.state }
+        $path = ''
+        if ($null -ne $cfg.WinreLocation) { $path = [string]$cfg.WinreLocation.path }
+
+        # Ohne InstallState hilft der Ablageort weiter: er ist leer, solange die
+        # Umgebung nicht eingerichtet ist.
+        $on = if ($null -ne $state) { $state -eq '1' } else { -not [string]::IsNullOrWhiteSpace($path) }
+
+        # Groesse und freier Platz sind Beiwerk, aber aufschlussreich: zu wenig Platz ist
+        # der Grund, aus dem WinRE-Updates reihenweise scheiterten. Der Ablageort in der
+        # Datei ist relativ, die Partition steckt in id (Datentraeger) und offset (Versatz
+        # in Byte) - danach wird gesucht, nicht im Pfad. Klappt es nicht, bleiben die
+        # Zahlen einfach weg.
+        $size = $null
+        $free = $null
+        try {
+            $disk = [int]$cfg.WinreLocation.id
+            $off  = [long]$cfg.WinreLocation.offset
+            $part = Get-Partition -DiskNumber $disk -ErrorAction Stop |
+                    Where-Object { $_.Offset -eq $off } | Select-Object -First 1
+            if ($part) {
+                $size = $part.Size
+                try { $free = ($part | Get-Volume -ErrorAction Stop).SizeRemaining } catch { }
+            }
+        } catch { }
+        return [pscustomobject]@{ Enabled = [bool]$on; Path = $path; Size = $size; Free = $free }
+    } catch { }
+    return $null
+}
+
 # --------------------------------------------------------------- User interface --
 $xaml = @'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -895,14 +1289,21 @@ $xaml = @'
           <Hyperlink x:Name="LnkUpdate" Foreground="#1A7F37" FontWeight="SemiBold"><Run x:Name="RunUpdate" Text=""/></Hyperlink>
         </TextBlock>
       </StackPanel>
-      <StackPanel Grid.Column="1" Orientation="Horizontal"
-                  VerticalAlignment="Top" Margin="12,2,0,0">
-        <Button x:Name="BtnLangEN" Tag="en" Content="EN" Width="38" Height="26" Margin="0,0,3,0"/>
-        <Button x:Name="BtnLangDE" Tag="de" Content="DE" Width="38" Height="26" Margin="0,0,3,0"/>
-        <Button x:Name="BtnLangFR" Tag="fr" Content="FR" Width="38" Height="26" Margin="0,0,3,0"/>
-        <Button x:Name="BtnLangES" Tag="es" Content="ES" Width="38" Height="26" Margin="0,0,3,0"/>
-        <Button x:Name="BtnLangPT" Tag="pt" Content="PT" Width="38" Height="26"/>
-      </StackPanel>
+      <!-- WrapPanel mit fester Hoechstbreite: Ab der sechsten Sprache bricht die Reihe
+           in eine zweite Zeile um, statt der Ueberschrift daneben Platz wegzunehmen.
+           205 = fuenf Knoepfe a 41 Pixel, also genau die Breite, die sie schon immer
+           hatte. Einheitlicher Rand rechts und unten, weil beim Umbruch jeder Knopf
+           der letzte einer Zeile sein kann. -->
+      <WrapPanel Grid.Column="1" Orientation="Horizontal" MaxWidth="205"
+                 VerticalAlignment="Top" Margin="12,2,0,0">
+        <Button x:Name="BtnLangEN" Tag="en" Content="EN" Width="38" Height="26" Margin="0,0,3,3"/>
+        <Button x:Name="BtnLangDE" Tag="de" Content="DE" Width="38" Height="26" Margin="0,0,3,3"/>
+        <Button x:Name="BtnLangFR" Tag="fr" Content="FR" Width="38" Height="26" Margin="0,0,3,3"/>
+        <Button x:Name="BtnLangES" Tag="es" Content="ES" Width="38" Height="26" Margin="0,0,3,3"/>
+        <Button x:Name="BtnLangPT" Tag="pt" Content="PT" Width="38" Height="26" Margin="0,0,3,3"/>
+        <Button x:Name="BtnLangIT" Tag="it" Content="IT" Width="38" Height="26" Margin="0,0,3,3"/>
+        <Button x:Name="BtnLangPL" Tag="pl" Content="PL" Width="38" Height="26" Margin="0,0,3,3"/>
+      </WrapPanel>
     </Grid>
 
     <!-- Der Schnappschuss steht bewusst oben und nicht bei den uebrigen Knoepfen am
@@ -946,6 +1347,7 @@ $xaml = @'
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
           <TextBlock x:Name="CapEdition" Grid.Row="0" Grid.Column="0" Margin="0,0,10,2"/>
           <TextBlock x:Name="TxtEdition" Grid.Row="0" Grid.Column="1" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
@@ -955,12 +1357,31 @@ $xaml = @'
           <TextBlock x:Name="TxtNext" Grid.Row="2" Grid.Column="1" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
           <TextBlock x:Name="CapDelta" Grid.Row="3" Grid.Column="0" Margin="0,0,10,2"/>
           <TextBlock x:Name="TxtDelta" Grid.Row="3" Grid.Column="1" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
-          <TextBlock x:Name="CapTaskState" Grid.Row="4" Grid.Column="0" Margin="0,0,10,0"/>
-          <TextBlock x:Name="TxtTaskState" Grid.Row="4" Grid.Column="1" Text="-" TextWrapping="Wrap"/>
+          <TextBlock x:Name="CapTaskState" Grid.Row="4" Grid.Column="0" Margin="0,0,10,2"/>
+          <TextBlock x:Name="TxtTaskState" Grid.Row="4" Grid.Column="1" Text="-" Margin="0,0,0,2" TextWrapping="Wrap"/>
+          <!-- Der Knopf steht in der Zeile, zu der er gehoert, und nicht unten bei den
+               uebrigen: Er handelt von der Umgebung, deren Zustand daneben steht. -->
+          <!-- Der Knopf macht diese Zeile hoeher als die vier darueber. Damit das nicht
+               schief aussieht, wird die Beschriftung mittig gesetzt statt oben, und der
+               Knopf bleibt flach: 21 Pixel sind gerade genug fuer die Schrift und lassen
+               die Zeile nur wenig wachsen. -->
+          <TextBlock x:Name="CapWinRE" Grid.Row="5" Grid.Column="0" Margin="0,0,10,0"
+                     VerticalAlignment="Center"/>
+          <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+            <TextBlock x:Name="TxtWinRE" Text="-" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <Button x:Name="BtnWinRE" Height="21" Padding="9,0" Margin="12,0,0,0" FontSize="11"
+                    VerticalAlignment="Center"/>
+          </StackPanel>
         </Grid>
         <Border BorderBrush="#C9D6E4" BorderThickness="1" Background="#EEF4FA"
                 Padding="8,5" Margin="0,8,0,0">
           <TextBlock x:Name="TxtIdleNote" TextWrapping="Wrap" Foreground="#2C4A66" FontSize="12"/>
+        </Border>
+        <!-- Nur sichtbar, wenn die Umgebung fehlt. Rot, weil in dem Fall alles andere
+             in diesem Fenster folgenlos bleibt. -->
+        <Border x:Name="BoxWinRE" BorderBrush="#E3B4B4" BorderThickness="1" Background="#FDF0F0"
+                Padding="8,5" Margin="0,8,0,0" Visibility="Collapsed">
+          <TextBlock x:Name="TxtWinReNote" TextWrapping="Wrap" Foreground="#8A2C2C" FontSize="12"/>
         </Border>
       </StackPanel>
     </GroupBox>
@@ -1031,10 +1452,24 @@ $xaml = @'
     </Grid>
 
     <GroupBox x:Name="GrpLog" Padding="6">
-      <TextBox x:Name="TxtLog" IsReadOnly="True" TextWrapping="Wrap"
-               VerticalScrollBarVisibility="Auto" Height="76"
-               BorderThickness="1" BorderBrush="#DDD" Background="White"
-               Padding="6" FontFamily="Consolas" FontSize="12"/>
+      <StackPanel>
+        <TextBox x:Name="TxtLog" IsReadOnly="True" TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto" Height="76"
+                 BorderThickness="1" BorderBrush="#DDD" Background="White"
+                 Padding="6" FontFamily="Consolas" FontSize="12"/>
+        <!-- Beim Protokoll und nicht bei den Knoepfen unten: Was hier herauskommt, ist
+             ein Textbericht, und genau darum geht es bei dem Knopf. Die Erklaerung steht
+             daneben und nicht darunter, damit die Zeile keine zusaetzliche Hoehe kostet. -->
+        <Grid Margin="0,6,0,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock x:Name="TxtCopyHint" Grid.Column="0" Foreground="#777" FontSize="11"
+                     TextWrapping="Wrap" VerticalAlignment="Center" Margin="2,0,12,0"/>
+          <Button x:Name="BtnCopy" Grid.Column="1" Height="24" Padding="12,0" FontSize="12"/>
+        </Grid>
+      </StackPanel>
     </GroupBox>
 
     </StackPanel>
@@ -1050,8 +1485,10 @@ foreach ($n in 'TxtHead','TxtSub','TxtIntro','TxtUnofficial',
                'LnkProject','LnkGuide','RunGuide',
                'TxtUpdate','LnkUpdate','RunUpdate',
                'BtnLangEN','BtnLangDE','BtnLangFR','BtnLangES','BtnLangPT',
+               'BtnLangIT','BtnLangPL',
                'BtnSnapNow','TxtSnapHint',
                'GrpState','CapEdition','TxtEdition','CapLast','TxtLast','CapNext','TxtNext',
+               'CapWinRE','TxtWinRE','BtnWinRE','BoxWinRE','TxtWinReNote','BtnCopy','TxtCopyHint',
                'CapTaskState','TxtTaskState','CapDelta','TxtDelta','TxtIdleNote',
                'GrpPoints','TxtPoints','TxtOldest','TxtStorage','TxtStoreNote','LstPoints',
                'TxtVolumeNote',
@@ -1188,6 +1625,13 @@ function Apply-Language {
     $ctl.LnkGuide.ToolTip    = T 'tipGuide'
     $ctl.BtnSnapNow.Content  = T 'btnSnapNow'
     $ctl.BtnSnapNow.ToolTip  = T 'tipSnapNow'
+    $ctl.BtnWinRE.Content    = T 'btnWinRE'
+    $ctl.BtnWinRE.ToolTip    = T 'tipWinRE'
+    $ctl.BtnCopy.Content     = T 'btnCopy'
+    $ctl.BtnCopy.ToolTip     = T 'tipCopy'
+    $ctl.TxtCopyHint.Text    = T 'copyHint'
+    $ctl.CapWinRE.Text       = T 'capWinRE'
+    $ctl.TxtWinReNote.Text   = T 'noteWinRE'
     $ctl.TxtSnapHint.Text    = T 'snapHint'
 
     # The notice may already be on screen when the language is switched.
@@ -1334,6 +1778,8 @@ function Update-View {
             $ctl.TxtTaskState.Text += '  ·  ' + ((T 'missedRuns') -f $info.NumberOfMissedRuns)
         }
 
+        Update-WinReRow
+
         # The scheduled interval is the repetition of the time trigger. Deriving it from
         # "next run minus last run" was wrong: when a run is skipped because the machine is
         # not idle - the normal case, and the very thing the note below explains - that gap
@@ -1395,6 +1841,63 @@ function Update-View {
 
     $ctl.LblSize.Text   = if ($null -eq $s) { "${eff}: $(T 'sizeStd')" }
                           else { "${eff}: $([math]::Round($s.Value/1024,1)) GB — ${src}: $(Get-LevelLabel $s.Level)" }
+}
+
+function Update-WinReRow {
+    $re = Get-WinReState
+    if ($null -eq $re) {
+        $ctl.TxtWinRE.Text = T 'winreUnk'
+        $ctl.TxtWinRE.Foreground = [System.Windows.Media.Brushes]::Gray
+        $ctl.BoxWinRE.Visibility = 'Collapsed'
+        return
+    }
+    if ($re.Enabled) {
+        $txt = T 'winreOn'
+        if ($re.Size) {
+            $txt += '  ·  ' + [string][math]::Round($re.Size / 1MB) + ' MB'
+            if ($re.Free) { $txt += ', ' + [string][math]::Round($re.Free / 1MB) + ' MB ' + (T 'winreFree') }
+        }
+        $ctl.TxtWinRE.Text = $txt
+        $ctl.TxtWinRE.Foreground = [System.Windows.Media.Brushes]::Black
+        $ctl.BoxWinRE.Visibility = 'Collapsed'
+    } else {
+        $ctl.TxtWinRE.Text = T 'winreOff'
+        $ctl.TxtWinRE.Foreground = New-Object System.Windows.Media.SolidColorBrush (
+            [System.Windows.Media.ColorConverter]::ConvertFromString('#B02A2A'))
+        $ctl.BoxWinRE.Visibility = 'Visible'
+    }
+}
+
+# Der Bericht ist bewusst genau das, was in einem Forenthread als Erstes erfragt wird.
+# Er benutzt die eingestellte Sprache: Wer auf Deutsch fragt, postet ihn auf Deutsch.
+function Get-StateReport {
+    $nl = [Environment]::NewLine
+    $out = New-Object System.Text.StringBuilder
+    [void]$out.AppendLine("pitr-config $Version - $(T 'grpState')")
+    [void]$out.AppendLine((Get-Date).ToString('u'))
+    [void]$out.AppendLine('')
+    foreach ($row in @(
+        @{ C = $ctl.CapEdition.Text;  V = $ctl.TxtEdition.Text }
+        @{ C = $ctl.CapLast.Text;     V = $ctl.TxtLast.Text }
+        @{ C = $ctl.CapNext.Text;     V = $ctl.TxtNext.Text }
+        @{ C = $ctl.CapDelta.Text;    V = $ctl.TxtDelta.Text }
+        @{ C = $ctl.CapTaskState.Text;V = $ctl.TxtTaskState.Text }
+        @{ C = $ctl.CapWinRE.Text;    V = $ctl.TxtWinRE.Text })) {
+        [void]$out.AppendLine(('{0,-28} {1}' -f $row.C, $row.V))
+    }
+    [void]$out.AppendLine('')
+    [void]$out.AppendLine("$(T 'grpPoints'): $($ctl.TxtPoints.Text)  ·  $($ctl.TxtOldest.Text)")
+    [void]$out.AppendLine($ctl.TxtStorage.Text)
+    [void]$out.AppendLine('')
+    [void]$out.AppendLine("$(T 'grpSet'):")
+    foreach ($row in @(
+        @{ C = $ctl.CapActive.Text; V = $ctl.LblActive.Text }
+        @{ C = $ctl.CapFreq.Text;   V = $ctl.LblFreq.Text }
+        @{ C = $ctl.CapReten.Text;  V = $ctl.LblReten.Text }
+        @{ C = $ctl.CapSize.Text;   V = $ctl.LblSize.Text })) {
+        [void]$out.AppendLine(('  {0}{1}    {2}' -f $row.C, $nl, $row.V))
+    }
+    return $out.ToString()
 }
 
 function Save-Settings {
@@ -1461,7 +1964,7 @@ function Invoke-TaskNow {
 
 function Set-Busy {
     param([bool]$On)
-    $buttons = @('BtnSnapNow','BtnReset','BtnRefresh','BtnApply','BtnApplyNow') +
+    $buttons = @('BtnSnapNow','BtnReset','BtnRefresh','BtnApply','BtnApplyNow','BtnWinRE','BtnCopy') +
                @($LangCodes | ForEach-Object { 'BtnLang' + $_.ToUpper() })
     foreach ($b in $buttons) { $ctl[$b].IsEnabled = -not $On }
     $window.Cursor = if ($On) { [System.Windows.Input.Cursors]::Wait } else { $null }
@@ -1484,6 +1987,8 @@ $ctl.BtnLangDE.Add_Click({ Set-Lang 'de' })
 $ctl.BtnLangFR.Add_Click({ Set-Lang 'fr' })
 $ctl.BtnLangES.Add_Click({ Set-Lang 'es' })
 $ctl.BtnLangPT.Add_Click({ Set-Lang 'pt' })
+$ctl.BtnLangIT.Add_Click({ Set-Lang 'it' })
+$ctl.BtnLangPL.Add_Click({ Set-Lang 'pl' })
 
 $ctl.LnkProject.Add_Click({
     try { Start-Process $ProjectUrl }
@@ -1527,6 +2032,26 @@ $ctl.BtnApplyNow.Add_Click({
     try { Save-Settings; Invoke-TaskNow; Update-View }
     catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
     finally { Set-Busy $false }
+})
+
+$ctl.BtnCopy.Add_Click({
+    try {
+        Set-Clipboard -Value (Get-StateReport)
+        Write-Log (T 'logCopied')
+    } catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
+})
+
+# Der einzige Knopf, der den Rechner neu startet - deshalb die Rueckfrage, und deshalb
+# steht in ihrem Text, was dabei verloren geht.
+$ctl.BtnWinRE.Add_Click({
+    $answer = [System.Windows.MessageBox]::Show((T 'askWinRE'), (T 'askWinRET'),
+        [System.Windows.MessageBoxButton]::YesNo, [System.Windows.MessageBoxImage]::Warning)
+    if ($answer -ne [System.Windows.MessageBoxResult]::Yes) { return }
+    try {
+        Write-Log (T 'logWinRE')
+        Update-Ui
+        Start-Process -FilePath 'shutdown.exe' -ArgumentList '/r', '/o', '/t', '3' -WindowStyle Hidden
+    } catch { Write-Log "$(T 'logError'): $($_.Exception.Message)" }
 })
 
 $ctl.BtnReset.Add_Click({
@@ -1578,6 +2103,143 @@ $window.Add_ContentRendered({
     } catch { }
 })
 
+# --------------------------------------------------------------- Command line --
+# Bewusst englisch, egal welche Anzeigesprache eingestellt ist: Diese Ausgabe wird von
+# Skripten gelesen und in Fehlerberichte kopiert, da ist eine stabile Sprache mehr wert
+# als eine hoefliche. Rueckgabewerte: 0 in Ordnung, 1 Eingabefehler.
+if ($Apply) {
+    $spec = @{
+        freq   = @{ Name = 'SnapshotInterval'; Min = 60;   Max = 1440;  Unit = 'min' }
+        reten  = @{ Name = 'MaxTimespan';      Min = 1440; Max = 10080; Unit = 'min' }
+        size   = @{ Name = 'MaxGlobalSize';    Min = 2048; Max = 51200; Unit = 'mb'  }
+        active = @{ Name = 'Active';           Min = 0;    Max = 1;     Unit = 'flag' }
+    }
+
+    function Convert-Amount {
+        param([string]$Key, [string]$Raw)
+        $u = $spec[$Key].Unit
+        if ($u -eq 'flag') {
+            switch ($Raw) {
+                'on'  { return 1 }
+                '1'   { return 1 }
+                'off' { return 0 }
+                '0'   { return 0 }
+            }
+            return $null
+        }
+        if ($Raw -notmatch '^(\d+)([a-z]*)$') { return $null }
+        $n = [int]$Matches[1]
+        $s = $Matches[2]
+        if ($u -eq 'min') {
+            switch ($s) {
+                ''  { return $n }
+                'm' { return $n }
+                'h' { return $n * 60 }
+                'd' { return $n * 1440 }
+            }
+            return $null
+        }
+        switch ($s) {
+            ''   { return $n }
+            'm'  { return $n }
+            'mb' { return $n }
+            'g'  { return $n * 1024 }
+            'gb' { return $n * 1024 }
+        }
+        return $null
+    }
+
+    $usage = @(
+        "pitr-config $Version",
+        '',
+        'Usage: pitr-config.cmd apply [freq=<n>h] [reten=<n>d] [size=<n>g] [active=on|off]',
+        '                            [reset] [status]',
+        '',
+        '  freq    60m to 24h    interval between restore points',
+        '  reten   1d to 7d      lifetime of a restore point',
+        '  size    2g to 50g     storage limit for all points together',
+        '  active  on | off      the feature itself',
+        '  reset                 removes every value this tool has written',
+        '  status                prints the values in effect and writes nothing',
+        '',
+        '  Any setting also takes "default", which removes that single override.',
+        '  Values are written at policy level and outrank the Settings app.',
+        '  Requires an elevated prompt; exit code 5 says it was not.'
+    ) -join [Environment]::NewLine
+
+    # Der erste Wortteil ist "apply" selbst, der faellt weg.
+    $words = @($Options -split '\s+' | Where-Object { $_ -ne '' })
+    if ($words.Count -gt 0 -and $words[0] -ieq 'apply') { $words = @($words[1..($words.Count - 1)]) }
+
+    if ($words.Count -eq 0 -or $words[0] -in @('/?', '-?', 'help', '--help')) {
+        Write-Host $usage
+        exit 1
+    }
+
+    $wanted = @{}
+    $doReset  = $false
+    $doStatus = $false
+    foreach ($w in $words) {
+        if ($w -ieq 'reset')  { $doReset  = $true; continue }
+        if ($w -ieq 'status') { $doStatus = $true; continue }
+        $kv = $w -split '=', 2
+        if ($kv.Count -ne 2 -or -not $spec.ContainsKey($kv[0].ToLower())) {
+            Write-Host "pitr-config: cannot read '$w'"
+            Write-Host ''
+            Write-Host $usage
+            exit 1
+        }
+        $key = $kv[0].ToLower()
+        $raw = $kv[1].ToLower()
+        if ($raw -eq 'default') { $wanted[$key] = $null; continue }
+        $val = Convert-Amount $key $raw
+        if ($null -eq $val) {
+            Write-Host "pitr-config: cannot read the value in '$w'"
+            exit 1
+        }
+        if ($val -lt $spec[$key].Min -or $val -gt $spec[$key].Max) {
+            Write-Host ("pitr-config: {0}={1} is outside the allowed range ({2} to {3} {4})" -f
+                        $key, $raw, $spec[$key].Min, $spec[$key].Max, $spec[$key].Unit)
+            exit 1
+        }
+        $wanted[$key] = $val
+    }
+
+    if ($doStatus) {
+        Write-Host "pitr-config $Version"
+        foreach ($k in @('active', 'freq', 'reten', 'size')) {
+            $cur = Get-PitrValue $spec[$k].Name
+            if ($null -eq $cur) { Write-Host ("  {0,-7} Windows default" -f $k) }
+            # Die rohe Stufe und nicht das uebersetzte Etikett: Diese Zeile wird von
+            # Skripten gelesen, da waere eine mitwandernde Sprache nur im Weg.
+            else { Write-Host ("  {0,-7} {1} ({2})" -f $k, $cur.Value, $cur.Level) }
+        }
+        exit 0
+    }
+
+    if ($doReset) {
+        $n = 0
+        foreach ($name in 'Active', 'SnapshotInterval', 'MaxTimespan', 'MaxGlobalSize', 'MaxCount') {
+            if (Remove-PitrValue $name) { Write-Host "removed ${name}_$Level"; $n++ }
+        }
+        if ($n -eq 0) { Write-Host 'nothing was set' }
+    }
+
+    foreach ($k in @('active', 'freq', 'reten', 'size')) {
+        if (-not $wanted.ContainsKey($k)) { continue }
+        $name = $spec[$k].Name
+        if ($null -eq $wanted[$k]) {
+            if (Remove-PitrValue $name) { Write-Host "removed ${name}_$Level" }
+            else { Write-Host "${name}_$Level was not set" }
+        } else {
+            Set-PitrValue $name $wanted[$k]
+            Write-Host "${name}_$Level = $($wanted[$k])"
+        }
+    }
+    Write-Host 'Takes effect on the next PITRTask run (it only runs when the system is idle).'
+    exit 0
+}
+
 if ($SelfTest) {
     foreach ($l in $LangCodes) {
         $script:Lang = $l
@@ -1603,6 +2265,9 @@ if ($SelfTest) {
         Write-Host "  Gruppen      : $($ctl.GrpState.Header) | $($ctl.GrpPoints.Header) | $($ctl.GrpSet.Header) | $($ctl.GrpLog.Header)"
         Write-Host "  Spalten      : $(($ctl.LstPoints.View.Columns | ForEach-Object { $_.Header }) -join ' | ')"
         Write-Host "  Schnappschuss: $($ctl.BtnSnapNow.Content) - $($ctl.TxtSnapHint.Text)"
+        Write-Host "  WinRE        : $($ctl.CapWinRE.Text) $($ctl.TxtWinRE.Text) [$($ctl.BtnWinRE.Content)]"
+        Write-Host "  WinRE-Warnung: $($ctl.TxtWinReNote.Text)"
+        Write-Host "  Kopierknopf  : $($ctl.BtnCopy.Content) - $($ctl.TxtCopyHint.Text)"
         Write-Host "  Knoepfe      : $($ctl.BtnReset.Content) | $($ctl.BtnRefresh.Content) | $($ctl.BtnApply.Content) | $($ctl.BtnApplyNow.Content)"
         Write-Host "  $($ctl.TxtPoints.Text)"
         Write-Host "  $($ctl.TxtOldest.Text)"

@@ -79,6 +79,8 @@
   <button type="button" data-lang="fr">FR</button>
   <button type="button" data-lang="es">ES</button>
   <button type="button" data-lang="pt">PT</button>
+  <button type="button" data-lang="it">IT</button>
+  <button type="button" data-lang="pl">PL</button>
 </nav>
 
 <!-- ============================================================= ENGLISH == -->
@@ -103,6 +105,15 @@
      appears in the list below. Since the scheduled task otherwise runs only while the machine
      is idle, the button lifts that condition for this one run and restores it afterwards.</p>
 
+  <h2>And the way back</h2>
+  <p>A restore point is applied from the Windows Recovery Environment, not from inside a
+     running Windows. <b>Restart to recovery</b>, next to the state line, reboots straight into
+     it. Windows does offer that route &mdash; Settings &rarr; System &rarr; Recovery &rarr;
+     Advanced startup &mdash; but several clicks away from anything to do with restore
+     points.</p>
+  <p>That same line shows whether the environment is there at all. If it is switched off, no
+     restore point can be applied by anyone, and the line turns red.</p>
+
   <h2>Getting started</h2>
   <p>Double-click <code>pitr-config.cmd</code>. It asks for administrator rights itself, then
      opens a window. Nothing is written until a button is pressed. The file can just as well
@@ -120,6 +131,8 @@
     <tr><th>Apply and run now</th><td>Writes the settings and runs the task immediately, so a restore point is created and the schedule is recalculated at once.</td></tr>
     <tr><th>Refresh</th><td>Re-reads the current state.</td></tr>
     <tr><th>Reset everything</th><td>Removes every value the tool has written, after asking. Windows returns to its own defaults.</td></tr>
+    <tr><th>Restart to recovery</th><td>Restarts Windows into the recovery environment, where a restore point can be applied. Unsaved work in other programs is lost.</td></tr>
+    <tr><th>Copy state</th><td>Copies the current state to the clipboard as plain text &mdash; made for a forum post or a bug report.</td></tr>
   </table></div>
 
   <h2>The settings</h2>
@@ -133,7 +146,7 @@
      Underneath each list, in grey, stands the value currently in effect and where it comes
      from.</p>
 
-  <h2>Three things worth knowing</h2>
+  <h2>Five things worth knowing</h2>
   <div class="note">
     <p><b>Frequency is an earliest possible interval, not a promise.</b> Restore points are
        only created while the system is idle. If the machine is in use, or switched off, the
@@ -146,11 +159,23 @@
     <p><b>This is an unofficial route.</b> The configuration values are not documented by
        Microsoft. A future Windows release may change them, at which point the normal Windows
        behaviour simply applies again.</p>
+    <p><b>The recovery environment has to be there.</b> A restore point is applied from it,
+       not from inside Windows. The window shows whether it is present; if it is switched off,
+       the points are of no use &mdash; an elevated <code>reagentc /enable</code> usually puts
+       it back.</p>
+    <p><b>It is not a backup.</b> The points sit on the very drive they protect, so a failed
+       disk, a stolen machine or a wiped volume takes them along. Point-in-time restore answers
+       a bad update or a bad driver; against hardware failure, theft or ransomware only a
+       backup on separate media helps.</p>
   </div>
 
   <h2>Undoing everything</h2>
   <p><b>Reset everything</b> removes all of it in one step. Existing restore points are never
      deleted by this tool — it only changes configuration.</p>
+  <h2>Support</h2>
+  <p>The tool is free and stays that way. If it saved an afternoon of reinstalling Windows, a
+     coffee is welcome: <a href="https://www.paypal.me/teslapunk">paypal.me/teslapunk</a>. Nothing in the tool itself ever asks for money &mdash; no notice,
+     no link, no reminder.</p>
 </section>
 
 <!-- ============================================================== GERMAN == -->
@@ -177,6 +202,15 @@
      Leerlauf läuft, hebt die Schaltfläche diese Bedingung für diesen einen Lauf auf und stellt
      sie danach wieder her.</p>
 
+  <h2>Und der Weg zur&uuml;ck</h2>
+  <p>Ein Wiederherstellungspunkt wird aus der Windows-Wiederherstellungsumgebung heraus
+     angewendet, nicht aus dem laufenden Windows. <b>Neustart zur Wiederherstellung</b> neben
+     der Zustandszeile startet direkt dorthin. Windows bietet diesen Weg durchaus &mdash;
+     Einstellungen &rarr; System &rarr; Wiederherstellung &rarr; Erweiterter Start &mdash; nur
+     mehrere Klicks entfernt von allem, was mit Wiederherstellungspunkten zu tun hat.</p>
+  <p>Dieselbe Zeile zeigt, ob es diese Umgebung &uuml;berhaupt gibt. Ist sie abgeschaltet, kann
+     niemand einen Wiederherstellungspunkt anwenden, und die Zeile wird rot.</p>
+
   <h2>Erste Schritte</h2>
   <p><code>pitr-config.cmd</code> doppelklicken. Die Datei fordert selbst Administratorrechte
      an und öffnet ein Fenster. Geschrieben wird erst beim Druck auf eine Schaltfläche. Die
@@ -196,6 +230,8 @@
     <tr><th>Übernehmen und sofort ausführen</th><td>Schreibt die Einstellungen und stößt die Aufgabe direkt an, sodass sofort ein Punkt entsteht und der Zeitplan neu berechnet wird.</td></tr>
     <tr><th>Aktualisieren</th><td>Liest den aktuellen Zustand neu ein.</td></tr>
     <tr><th>Alles zurücksetzen</th><td>Entfernt nach Rückfrage alle vom Werkzeug geschriebenen Werte. Windows kehrt zu seinen eigenen Vorgaben zurück.</td></tr>
+    <tr><th>Neustart zur Wiederherstellung</th><td>Startet Windows in die Wiederherstellungsumgebung, in der sich ein Wiederherstellungspunkt anwenden l&auml;sst. Nicht Gespeichertes in anderen Programmen geht verloren.</td></tr>
+    <tr><th>Zustand kopieren</th><td>Kopiert den aktuellen Zustand als Klartext in die Zwischenablage &mdash; gemacht f&uuml;r einen Forenbeitrag oder eine Fehlermeldung.</td></tr>
   </table></div>
 
   <h2>Die Einstellungen</h2>
@@ -209,7 +245,7 @@
      Überschreibung wieder entfernt. Unter jeder Liste steht in Grau der aktuell wirksame
      Wert und woher er stammt.</p>
 
-  <h2>Drei Dinge, die man wissen sollte</h2>
+  <h2>Fünf Dinge, die man wissen sollte</h2>
   <div class="note">
     <p><b>Die Häufigkeit ist ein frühestmöglicher Abstand, keine Zusage.</b>
        Wiederherstellungspunkte entstehen nur, wenn das System im Leerlauf ist. Wird der
@@ -224,12 +260,26 @@
     <p><b>Das ist ein inoffizieller Weg.</b> Die Konfigurationswerte sind von Microsoft nicht
        dokumentiert. Eine künftige Windows-Version kann sie ändern; dann gilt wieder das
        normale Verhalten von Windows.</p>
+    <p><b>Die Wiederherstellungsumgebung muss da sein.</b> Ein Wiederherstellungspunkt wird
+       von dort aus angewendet, nicht aus Windows heraus. Das Fenster zeigt, ob sie vorhanden
+       ist; fehlt sie, n&uuml;tzen die Punkte nichts &mdash; ein <code>reagentc /enable</code>
+       mit Administratorrechten stellt sie meist wieder her.</p>
+    <p><b>Es ist keine Sicherung.</b> Die Punkte liegen auf genau dem Laufwerk, das sie
+       sch&uuml;tzen &mdash; eine defekte Platte, ein gestohlener Rechner oder ein
+       gel&ouml;schtes Laufwerk nimmt sie mit. Die Zeitpunktwiederherstellung ist die Antwort
+       auf ein missgl&uuml;cktes Update oder einen fehlerhaften Treiber; gegen Hardwaredefekt,
+       Diebstahl oder Verschl&uuml;sselungstrojaner hilft nur eine Sicherung auf getrenntem
+       Datentr&auml;ger.</p>
   </div>
 
   <h2>Alles rückgängig machen</h2>
   <p><b>Alles zurücksetzen</b> entfernt sämtliche Werte in einem Schritt. Vorhandene
      Wiederherstellungspunkte löscht das Werkzeug nie — es ändert ausschließlich die
      Konfiguration.</p>
+  <h2>Unterst&uuml;tzung</h2>
+  <p>Das Werkzeug ist kostenlos und bleibt es. Wenn es einen Nachmittag Windows-Neuinstallation
+     erspart hat, ist ein Kaffee willkommen: <a href="https://www.paypal.me/teslapunk">paypal.me/teslapunk</a>. Im Werkzeug selbst wird nie nach Geld gefragt
+     &mdash; kein Hinweis, kein Link, keine Erinnerung.</p>
 </section>
 
 <!-- ============================================================== FRENCH == -->
@@ -256,6 +306,18 @@
      autrement que pendant l'inactivité, le bouton lève cette condition pour cette seule
      exécution et la rétablit ensuite.</p>
 
+  <h2>Et le chemin du retour</h2>
+  <p>Un point de restauration s'applique depuis l'environnement de r&eacute;cup&eacute;ration de
+     Windows, pas depuis un Windows en cours d'ex&eacute;cution. <b>Red&eacute;marrer vers la
+     r&eacute;cup&eacute;ration</b>, &agrave; c&ocirc;t&eacute; de la ligne d'&eacute;tat,
+     red&eacute;marre directement dedans. Windows propose bien ce chemin &mdash;
+     Param&egrave;tres &rarr; Syst&egrave;me &rarr; R&eacute;cup&eacute;ration &rarr;
+     D&eacute;marrage avanc&eacute; &mdash; mais &agrave; plusieurs clics de tout ce qui touche
+     aux points de restauration.</p>
+  <p>Cette m&ecirc;me ligne indique si cet environnement existe. S'il est
+     d&eacute;sactiv&eacute;, personne ne peut appliquer de point de restauration, et la ligne
+     passe au rouge.</p>
+
   <h2>Premiers pas</h2>
   <p>Double-clic sur <code>pitr-config.cmd</code>. Le fichier demande lui-même les droits
      d'administrateur et ouvre une fenêtre. Rien n'est écrit tant qu'aucun bouton n'a été
@@ -275,6 +337,8 @@
     <tr><th>Appliquer et exécuter maintenant</th><td>Écrit les réglages et lance la tâche immédiatement : un point est créé et la planification est recalculée aussitôt.</td></tr>
     <tr><th>Actualiser</th><td>Relit l'état actuel.</td></tr>
     <tr><th>Tout réinitialiser</th><td>Supprime, après confirmation, toutes les valeurs écrites par l'outil. Windows revient à ses propres valeurs par défaut.</td></tr>
+    <tr><th>Red&eacute;marrer vers la r&eacute;cup&eacute;ration</th><td>Red&eacute;marre Windows dans l'environnement de r&eacute;cup&eacute;ration, o&ugrave; un point de restauration peut &ecirc;tre appliqu&eacute;. Le travail non enregistr&eacute; dans les autres programmes est perdu.</td></tr>
+    <tr><th>Copier l'&eacute;tat</th><td>Copie l'&eacute;tat actuel en texte brut dans le presse-papiers &mdash; pr&eacute;vu pour un message de forum ou un rapport d'erreur.</td></tr>
   </table></div>
 
   <h2>Les réglages</h2>
@@ -288,7 +352,7 @@
      ce remplacement précis. Sous chaque liste, en gris, figure la valeur actuellement
      appliquée et sa provenance.</p>
 
-  <h2>Trois choses à savoir</h2>
+  <h2>Cinq choses à savoir</h2>
   <div class="note">
     <p><b>La fréquence est un intervalle minimal, pas une promesse.</b> Les points de
        restauration ne sont créés que lorsque le système est inactif. Si la machine est
@@ -302,11 +366,27 @@
     <p><b>Il s'agit d'une voie non officielle.</b> Les valeurs de configuration ne sont pas
        documentées par Microsoft. Une future version de Windows peut les modifier ; le
        comportement normal de Windows s'appliquera alors de nouveau.</p>
+    <p><b>L'environnement de r&eacute;cup&eacute;ration doit &ecirc;tre pr&eacute;sent.</b> Un
+       point de restauration s'applique depuis cet environnement, pas depuis Windows. La
+       fen&ecirc;tre indique s'il est l&agrave; ; s'il est d&eacute;sactiv&eacute;, les points
+       ne servent &agrave; rien &mdash; un <code>reagentc /enable</code> avec des droits
+       d'administrateur le r&eacute;tablit en g&eacute;n&eacute;ral.</p>
+    <p><b>Ce n'est pas une sauvegarde.</b> Les points se trouvent sur le disque m&ecirc;me
+       qu'ils prot&egrave;gent : un disque d&eacute;faillant, une machine vol&eacute;e ou un
+       volume effac&eacute; les emporte. La restauration &agrave; un instant donn&eacute;
+       r&eacute;pond &agrave; une mise &agrave; jour rat&eacute;e ou &agrave; un pilote
+       d&eacute;fectueux ; contre une panne mat&eacute;rielle, un vol ou un ran&ccedil;ongiciel,
+       seule une sauvegarde sur un support s&eacute;par&eacute; aide.</p>
   </div>
 
   <h2>Tout annuler</h2>
   <p><b>Tout réinitialiser</b> supprime l'ensemble en une seule étape. L'outil ne supprime
      jamais les points de restauration existants : il ne modifie que la configuration.</p>
+  <h2>Soutien</h2>
+  <p>L'outil est gratuit et le restera. S'il a &eacute;vit&eacute; un apr&egrave;s-midi de
+     r&eacute;installation de Windows, un caf&eacute; est le bienvenu&nbsp;: <a href="https://www.paypal.me/teslapunk">paypal.me/teslapunk</a>. Dans l'outil
+     lui-m&ecirc;me, il n'est jamais question d'argent &mdash; ni mention, ni lien, ni
+     rappel.</p>
 </section>
 
 <!-- ============================================================= SPANISH == -->
@@ -333,6 +413,16 @@
      ejecuta con el equipo inactivo, el botón levanta esa condición para esta única ejecución y
      la restablece al terminar.</p>
 
+  <h2>Y el camino de vuelta</h2>
+  <p>Un punto de restauraci&oacute;n se aplica desde el entorno de recuperaci&oacute;n de
+     Windows, no desde un Windows en marcha. <b>Reiniciar a recuperaci&oacute;n</b>, junto a la
+     l&iacute;nea de estado, arranca directamente en &eacute;l. Windows ofrece ese camino
+     &mdash; Configuraci&oacute;n &rarr; Sistema &rarr; Recuperaci&oacute;n &rarr; Inicio
+     avanzado &mdash; pero a varios clics de todo lo relacionado con los puntos de
+     restauraci&oacute;n.</p>
+  <p>Esa misma l&iacute;nea indica si el entorno existe siquiera. Si est&aacute; desactivado,
+     nadie puede aplicar un punto de restauraci&oacute;n, y la l&iacute;nea se pone roja.</p>
+
   <h2>Primeros pasos</h2>
   <p>Doble clic en <code>pitr-config.cmd</code>. El archivo solicita por sí mismo permisos
      de administrador y abre una ventana. No se escribe nada hasta que se pulsa un botón. El
@@ -352,6 +442,8 @@
     <tr><th>Aplicar y ejecutar ahora</th><td>Escribe los ajustes y ejecuta la tarea de inmediato, de modo que se crea un punto y el calendario se recalcula al instante.</td></tr>
     <tr><th>Actualizar</th><td>Vuelve a leer el estado actual.</td></tr>
     <tr><th>Restablecer todo</th><td>Elimina, tras confirmación, todos los valores escritos por la herramienta. Windows vuelve a sus propios valores predeterminados.</td></tr>
+    <tr><th>Reiniciar a recuperaci&oacute;n</th><td>Reinicia Windows en el entorno de recuperaci&oacute;n, donde se puede aplicar un punto de restauraci&oacute;n. El trabajo sin guardar en otros programas se pierde.</td></tr>
+    <tr><th>Copiar el estado</th><td>Copia el estado actual como texto sin formato al portapapeles &mdash; pensado para un mensaje de foro o un informe de error.</td></tr>
   </table></div>
 
   <h2>Los ajustes</h2>
@@ -365,7 +457,7 @@
      sobrescritura concreta. Debajo de cada lista, en gris, se ve el valor actualmente en vigor
      y de dónde procede.</p>
 
-  <h2>Tres cosas que conviene saber</h2>
+  <h2>Cinco cosas que conviene saber</h2>
   <div class="note">
     <p><b>La frecuencia es un intervalo mínimo, no una promesa.</b> Los puntos de restauración
        solo se crean cuando el sistema está inactivo. Si está usando el equipo, o si está
@@ -378,11 +470,24 @@
     <p><b>Esta es una vía no oficial.</b> Los valores de configuración no están documentados
        por Microsoft. Una versión futura de Windows puede cambiarlos; entonces volverá a
        aplicarse simplemente el comportamiento normal de Windows.</p>
+    <p><b>El entorno de recuperaci&oacute;n tiene que estar.</b> Un punto de restauraci&oacute;n
+       se aplica desde ah&iacute;, no desde dentro de Windows. La ventana indica si est&aacute;
+       presente; si est&aacute; desactivado, los puntos no sirven de nada: un
+       <code>reagentc /enable</code> con derechos de administrador suele restablecerlo.</p>
+    <p><b>No es una copia de seguridad.</b> Los puntos est&aacute;n en la misma unidad que
+       protegen: un disco averiado, un equipo robado o un volumen borrado se los lleva. La
+       restauraci&oacute;n a un momento anterior responde a una actualizaci&oacute;n fallida o a
+       un controlador defectuoso; contra una aver&iacute;a de hardware, un robo o un ransomware
+       solo ayuda una copia de seguridad en un medio aparte.</p>
   </div>
 
   <h2>Deshacerlo todo</h2>
   <p><b>Restablecer todo</b> lo elimina en un solo paso. La herramienta nunca borra puntos de
      restauración existentes: solo cambia la configuración.</p>
+  <h2>Apoyo</h2>
+  <p>La herramienta es gratuita y seguir&aacute; si&eacute;ndolo. Si ha ahorrado una tarde de
+     reinstalaci&oacute;n de Windows, un caf&eacute; es bienvenido: <a href="https://www.paypal.me/teslapunk">paypal.me/teslapunk</a>. En la herramienta misma
+     nunca se pide dinero: ni aviso, ni enlace, ni recordatorio.</p>
 </section>
 
 <!-- ========================================================== PORTUGUESE == -->
@@ -408,6 +513,17 @@
      aparece na lista abaixo. Como a tarefa agendada, de resto, só é executada com o computador
      ocioso, o botão suspende essa condição nessa única execução e a restabelece em seguida.</p>
 
+  <h2>E o caminho de volta</h2>
+  <p>Um ponto de restaura&ccedil;&atilde;o &eacute; aplicado a partir do ambiente de
+     recupera&ccedil;&atilde;o do Windows, n&atilde;o de dentro de um Windows em execu&ccedil;&atilde;o.
+     <b>Reiniciar para a recupera&ccedil;&atilde;o</b>, ao lado da linha de estado, reinicia
+     direto nele. O Windows oferece esse caminho &mdash; Configura&ccedil;&otilde;es &rarr;
+     Sistema &rarr; Recupera&ccedil;&atilde;o &rarr; Inicializa&ccedil;&atilde;o avan&ccedil;ada
+     &mdash; mas a v&aacute;rios cliques de tudo o que diz respeito aos pontos de
+     restaura&ccedil;&atilde;o.</p>
+  <p>Essa mesma linha mostra se o ambiente existe. Se estiver desativado, ningu&eacute;m
+     consegue aplicar um ponto de restaura&ccedil;&atilde;o, e a linha fica vermelha.</p>
+
   <h2>Primeiros passos</h2>
   <p>Duplo clique em <code>pitr-config.cmd</code>. O arquivo solicita por conta própria
      direitos de administrador e abre uma janela. Nada é gravado até que um botão seja
@@ -427,6 +543,8 @@
     <tr><th>Aplicar e executar agora</th><td>Grava as configurações e executa a tarefa imediatamente, criando um ponto e recalculando o agendamento na hora.</td></tr>
     <tr><th>Atualizar</th><td>Relê o estado atual.</td></tr>
     <tr><th>Redefinir tudo</th><td>Remove, após confirmação, todos os valores gravados pela ferramenta. O Windows volta aos próprios padrões.</td></tr>
+    <tr><th>Reiniciar para a recupera&ccedil;&atilde;o</th><td>Reinicia o Windows no ambiente de recupera&ccedil;&atilde;o, onde um ponto de restaura&ccedil;&atilde;o pode ser aplicado. O trabalho n&atilde;o salvo em outros programas &eacute; perdido.</td></tr>
+    <tr><th>Copiar o estado</th><td>Copia o estado atual como texto simples para a &aacute;rea de transfer&ecirc;ncia &mdash; feito para uma mensagem de f&oacute;rum ou um relato de erro.</td></tr>
   </table></div>
 
   <h2>As configurações</h2>
@@ -440,7 +558,7 @@
      específica. Abaixo de cada lista, em cinza, aparece o valor atualmente em vigor e de onde
      ele vem.</p>
 
-  <h2>Três coisas que vale saber</h2>
+  <h2>Cinco coisas que vale saber</h2>
   <div class="note">
     <p><b>A frequência é um intervalo mínimo, não uma promessa.</b> Os pontos de restauração só
        são criados quando o sistema está ocioso. Se o computador estiver em uso, ou desligado,
@@ -453,11 +571,240 @@
     <p><b>Este é um caminho não oficial.</b> Os valores de configuração não são documentados
        pela Microsoft. Uma versão futura do Windows pode alterá-los; nesse caso volta a valer
        simplesmente o comportamento normal do Windows.</p>
+    <p><b>O ambiente de recupera&ccedil;&atilde;o precisa existir.</b> Um ponto de
+       restaura&ccedil;&atilde;o &eacute; aplicado a partir dele, n&atilde;o de dentro do
+       Windows. A janela mostra se ele est&aacute; presente; se estiver desativado, os pontos
+       n&atilde;o servem para nada &mdash; um <code>reagentc /enable</code> com direitos de
+       administrador costuma restabelec&ecirc;-lo.</p>
+    <p><b>N&atilde;o &eacute; um backup.</b> Os pontos ficam na mesma unidade que protegem:
+       um disco com defeito, um computador roubado ou um volume apagado os leva junto. A
+       restaura&ccedil;&atilde;o a um ponto no tempo responde a uma atualiza&ccedil;&atilde;o
+       malsucedida ou a um driver defeituoso; contra falha de hardware, roubo ou ransomware s&oacute;
+       ajuda um backup em m&iacute;dia separada.</p>
   </div>
 
   <h2>Desfazer tudo</h2>
   <p><b>Redefinir tudo</b> remove tudo em uma única etapa. A ferramenta nunca exclui pontos de
      restauração existentes — ela apenas altera a configuração.</p>
+  <h2>Apoio</h2>
+  <p>A ferramenta &eacute; gratuita e continuar&aacute; assim. Se poupou uma tarde de
+     reinstala&ccedil;&atilde;o do Windows, um caf&eacute; &eacute; bem-vindo: <a href="https://www.paypal.me/teslapunk">paypal.me/teslapunk</a>. Na
+     pr&oacute;pria ferramenta nunca se pede dinheiro &mdash; nenhum aviso, nenhum link, nenhum
+     lembrete.</p>
+</section>
+
+<!-- ============================================================= ITALIAN == -->
+<section data-lang="it" hidden>
+  <h1>pitr-config &mdash; guida rapida</h1>
+  <p class="sub">Configurare il ripristino a un punto nel tempo in Windows 11.</p>
+
+  <h2>A cosa serve questo strumento</h2>
+  <p>Windows 11 pu&ograve; creare istantanee complete del sistema e riportare il computer a uno
+     stato precedente. Ogni <b>quanto</b> ci&ograve; avviene e per <b>quanto tempo</b>
+     un'istantanea viene conservata si pu&ograve; impostare solo nell'edizione Enterprise:
+     ovunque altro quei due elenchi sono disattivati.</p>
+  <p>Questo strumento li imposta lo stesso. La limitazione si trova nell'interfaccia delle
+     impostazioni, non nel motore sottostante, e quel motore legge la propria configurazione
+     da un punto in cui lo strumento pu&ograve; scrivere direttamente.</p>
+
+  <h2>Un'istantanea quando serve</h2>
+  <p>Il pulsante verde in alto nella finestra, <b>Crea subito un'istantanea</b>, crea
+     immediatamente un punto di ripristino: senza aspettare la pianificazione e senza toccare
+     alcuna impostazione. Un clic che vale la pena prima di installare un driver, di modificare
+     il registro di sistema o di avviare per la prima volta un programma sconosciuto.</p>
+  <p>Ci vuole un momento: l'attivit&agrave; viene eseguita, Windows scrive la copia shadow e il
+     nuovo punto compare nell'elenco pi&ugrave; in basso. Poich&eacute; per il resto
+     l'attivit&agrave; pianificata viene eseguita solo a sistema inattivo, il pulsante sospende
+     quella condizione per questa sola esecuzione e la ripristina subito dopo.</p>
+
+  <h2>E la via del ritorno</h2>
+  <p>Un punto di ripristino viene applicato dall'ambiente ripristino di Windows, non da un
+     Windows in esecuzione. <b>Riavvia al ripristino</b>, accanto alla riga di stato, riavvia
+     direttamente l&igrave;. Windows offre questa strada &mdash; Impostazioni &rarr; Sistema
+     &rarr; Ripristino &rarr; Avvio avanzato &mdash; ma a diversi clic di distanza da tutto
+     ci&ograve; che riguarda i punti di ripristino.</p>
+  <p>La stessa riga mostra se quell'ambiente esiste. Se &egrave; disattivato, nessuno pu&ograve;
+     applicare un punto di ripristino, e la riga diventa rossa.</p>
+
+  <h2>Primi passi</h2>
+  <p>Doppio clic su <code>pitr-config.cmd</code>. Il file richiede da solo i diritti di
+     amministratore e apre una finestra. Non viene scritto nulla finch&eacute; non si preme un
+     pulsante. Il file pu&ograve; stare altrettanto bene su una chiavetta USB o su una cartella
+     di rete: viene eseguito da dove si trova.</p>
+  <p>La lingua segue quella di visualizzazione di Windows; i pulsanti in alto a destra la
+     cambiano in qualsiasi momento.</p>
+  <p>All'avvio lo strumento chiede a GitHub se esiste una versione pi&ugrave; recente e, in tal
+     caso, mostra una riga con un collegamento. Non scarica n&eacute; installa mai nulla da
+     solo, e un controllo fallito resta silenzioso. Avviandolo come
+     <code>pitr-config.cmd noupdate</code> il controllo viene saltato.</p>
+
+  <h2>I pulsanti</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Crea subito un'istantanea</th><td>Crea subito un punto di ripristino, senza modificare alcuna impostazione. &Egrave; il pulsante in evidenza in alto nella finestra.</td></tr>
+    <tr><th>Applica</th><td>Scrive le impostazioni scelte. Una nuova frequenza ha effetto alla successiva esecuzione dell'attivit&agrave; pianificata.</td></tr>
+    <tr><th>Applica ed esegui subito</th><td>Scrive le impostazioni ed esegue subito l'attivit&agrave;, cos&igrave; viene creato un punto e la pianificazione viene ricalcolata all'istante.</td></tr>
+    <tr><th>Aggiorna</th><td>Rilegge lo stato attuale.</td></tr>
+    <tr><th>Reimposta tutto</th><td>Rimuove, previa conferma, tutti i valori scritti dallo strumento. Windows torna alle proprie impostazioni predefinite.</td></tr>
+    <tr><th>Riavvia al ripristino</th><td>Riavvia Windows nell'ambiente di ripristino, dove &egrave; possibile applicare un punto di ripristino. Il lavoro non salvato negli altri programmi va perso.</td></tr>
+    <tr><th>Copia lo stato</th><td>Copia lo stato attuale negli appunti come testo semplice &mdash; pensato per un messaggio in un forum o una segnalazione.</td></tr>
+  </table></div>
+
+  <h2>Le impostazioni</h2>
+  <ul>
+    <li><b>Funzione attivata</b> &mdash; attiva o disattiva il ripristino a un punto nel tempo.</li>
+    <li><b>Frequenza</b> &mdash; da 1 a 24 ore tra un punto di ripristino e l'altro.</li>
+    <li><b>Conservazione</b> &mdash; da 1 a 7 giorni prima che un punto venga eliminato automaticamente.</li>
+    <li><b>Spazio massimo</b> &mdash; da 2 a 50 GB per tutti i punti di ripristino insieme.</li>
+  </ul>
+  <p>Ogni elenco inizia con <b>Impostazione predefinita di Windows</b>, che rimuove di nuovo
+     quella singola modifica. Sotto ogni elenco, in grigio, &egrave; indicato il valore
+     attualmente in vigore e da dove proviene.</p>
+
+  <h2>Cinque cose da sapere</h2>
+  <div class="note">
+    <p><b>La frequenza &egrave; un intervallo minimo, non una promessa.</b> I punti di
+       ripristino vengono creati solo mentre il sistema &egrave; inattivo. Se il computer
+       &egrave; in uso, o spento, l'esecuzione viene rinviata e un appuntamento pu&ograve;
+       saltare del tutto. Impostare un'ora su un computer usato tutto il giorno non
+       produrr&agrave; ventiquattro punti. La finestra mostra lo stato dell'attivit&agrave;,
+       cos&igrave; un'esecuzione in attesa resta visibile.</p>
+    <p><b>Viene protetta solo l'unit&agrave; di Windows.</b> Le altre partizioni e gli altri
+       dischi non sono inclusi, nemmeno sullo stesso disco fisico. I dati che vi si trovano non
+       sono n&eacute; protetti n&eacute; ripristinati e hanno ancora bisogno di un backup
+       proprio.</p>
+    <p><b>&Egrave; una via non ufficiale.</b> I valori di configurazione non sono documentati da
+       Microsoft. Una futura versione di Windows pu&ograve; cambiarli, e in quel caso torna
+       semplicemente il comportamento normale di Windows.</p>
+    <p><b>L'ambiente di ripristino deve esserci.</b> Un punto di ripristino viene applicato da
+       l&igrave;, non da dentro Windows. La finestra mostra se &egrave; presente; se &egrave;
+       disattivato, i punti non servono a nulla: un <code>reagentc /enable</code> con diritti
+       di amministratore di solito lo ristabilisce.</p>
+    <p><b>Non &egrave; un backup.</b> I punti si trovano sull'unit&agrave; stessa che
+       proteggono: un disco guasto, un computer rubato o un volume cancellato se li porta via.
+       Il ripristino a un punto nel tempo risponde a un aggiornamento mal riuscito o a un driver
+       difettoso; contro un guasto hardware, un furto o un ransomware serve solo un backup su un
+       supporto separato.</p>
+  </div>
+
+  <h2>Annullare tutto</h2>
+  <p><b>Reimposta tutto</b> rimuove ogni cosa in un solo passaggio. I punti di ripristino
+     esistenti non vengono mai eliminati dallo strumento: cambia soltanto la configurazione.</p>
+  <h2>Sostegno</h2>
+  <p>Lo strumento &egrave; gratuito e rester&agrave; tale. Se ha risparmiato un pomeriggio di
+     reinstallazione di Windows, un caff&egrave; &egrave; benvenuto: <a href="https://www.paypal.me/teslapunk">paypal.me/teslapunk</a>. Nello strumento stesso
+     non si chiede mai denaro: nessun avviso, nessun collegamento, nessun promemoria.</p>
+</section>
+
+<!-- ============================================================== POLISH == -->
+<section data-lang="pl" hidden>
+  <h1>pitr-config &mdash; kr&oacute;tki przewodnik</h1>
+  <p class="sub">Konfigurowanie przywracania do punktu w czasie w systemie Windows 11.</p>
+
+  <h2>Do czego s&#322;u&#380;y to narz&#281;dzie</h2>
+  <p>Windows 11 potrafi tworzy&#263; pe&#322;ne migawki systemu i cofa&#263; komputer do
+     wcze&#347;niejszego stanu. To, jak <b>cz&#281;sto</b> to robi i jak <b>d&#322;ugo</b>
+     migawka jest przechowywana, mo&#380;na ustawi&#263; wy&#322;&#261;cznie w edycji
+     Enterprise &mdash; wsz&#281;dzie indziej te dwie listy s&#261; wyszarzone.</p>
+  <p>To narz&#281;dzie ustawia je mimo to. Ograniczenie tkwi w interfejsie aplikacji
+     Ustawienia, a nie w mechanizmie pod spodem, a ten mechanizm czyta swoj&#261;
+     konfiguracj&#281; z miejsca, do kt&oacute;rego narz&#281;dzie mo&#380;e pisa&#263;
+     bezpo&#347;rednio.</p>
+
+  <h2>Migawka wtedy, kiedy jest potrzebna</h2>
+  <p>Zielony przycisk u g&oacute;ry okna, <b>Utw&oacute;rz migawk&#281; teraz</b>, tworzy punkt
+     przywracania natychmiast &mdash; bez czekania na harmonogram i bez zmiany jakiegokolwiek
+     ustawienia. Jedno klikni&#281;cie warte zachodu przed instalacj&#261; sterownika,
+     zmian&#261; w rejestrze albo pierwszym uruchomieniem nieznanego programu.</p>
+  <p>Trwa to chwil&#281;: zadanie jest wykonywane, Windows zapisuje kopi&#281; w tle, a nowy
+     punkt pojawia si&#281; na li&#347;cie poni&#380;ej. Poniewa&#380; zaplanowane zadanie
+     poza tym uruchamia si&#281; tylko przy bezczynnym systemie, przycisk znosi ten warunek na
+     to jedno uruchomienie i przywraca go zaraz potem.</p>
+
+  <h2>I droga powrotna</h2>
+  <p>Punkt przywracania stosuje si&#281; ze &#347;rodowiska odzyskiwania systemu Windows, a nie
+     z poziomu dzia&#322;aj&#261;cego systemu. <b>Uruchom ponownie do odzyskiwania</b> obok
+     wiersza stanu uruchamia komputer prosto do niego. Windows udost&#281;pnia t&#281;
+     drog&#281; &mdash; Ustawienia &rarr; System &rarr; Odzyskiwanie &rarr; Uruchamianie
+     zaawansowane &mdash; ale kilka klikni&#281;&#263; od wszystkiego, co dotyczy punkt&oacute;w
+     przywracania.</p>
+  <p>Ten sam wiersz pokazuje, czy to &#347;rodowisko w og&oacute;le istnieje. Gdy jest
+     wy&#322;&#261;czone, nikt nie mo&#380;e zastosowa&#263; punktu przywracania, a wiersz
+     staje si&#281; czerwony.</p>
+
+  <h2>Pierwsze kroki</h2>
+  <p>Podw&oacute;jne klikni&#281;cie pliku <code>pitr-config.cmd</code>. Plik sam prosi o
+     uprawnienia administratora i otwiera okno. Nic nie zostaje zapisane, dop&oacute;ki nie
+     zostanie naci&#347;ni&#281;ty przycisk. Plik mo&#380;e r&oacute;wnie dobrze
+     le&#380;e&#263; na pendrivie albo w udziale sieciowym &mdash; dzia&#322;a stamt&#261;d,
+     gdzie jest.</p>
+  <p>J&#281;zyk odpowiada j&#281;zykowi wy&#347;wietlania systemu Windows; przyciski w prawym
+     g&oacute;rnym rogu prze&#322;&#261;czaj&#261; go w dowolnej chwili.</p>
+  <p>Przy starcie narz&#281;dzie pyta serwis GitHub, czy istnieje nowsza wersja, i pokazuje
+     wiersz z odno&#347;nikiem, je&#347;li tak jest. Nigdy niczego nie pobiera ani nie instaluje
+     samo, a nieudane sprawdzenie pozostaje bez komunikatu. Uruchomienie jako
+     <code>pitr-config.cmd noupdate</code> pomija sprawdzenie.</p>
+
+  <h2>Przyciski</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Utw&oacute;rz migawk&#281; teraz</th><td>Tworzy punkt przywracania od razu, bez zmiany jakiegokolwiek ustawienia. To wyr&oacute;&#380;niony przycisk u g&oacute;ry okna.</td></tr>
+    <tr><th>Zastosuj</th><td>Zapisuje wybrane ustawienia. Nowa cz&#281;stotliwo&#347;&#263; zaczyna obowi&#261;zywa&#263; przy nast&#281;pnym uruchomieniu zaplanowanego zadania.</td></tr>
+    <tr><th>Zastosuj i uruchom teraz</th><td>Zapisuje ustawienia i od razu uruchamia zadanie, dzi&#281;ki czemu powstaje punkt, a harmonogram zostaje przeliczony od nowa.</td></tr>
+    <tr><th>Od&#347;wie&#380;</th><td>Ponownie odczytuje bie&#380;&#261;cy stan.</td></tr>
+    <tr><th>Resetuj wszystko</th><td>Usuwa, po potwierdzeniu, wszystkie warto&#347;ci zapisane przez narz&#281;dzie. Windows wraca do w&#322;asnych ustawie&#324; domy&#347;lnych.</td></tr>
+    <tr><th>Uruchom ponownie do odzyskiwania</th><td>Uruchamia system Windows ponownie w &#347;rodowisku odzyskiwania, gdzie mo&#380;na zastosowa&#263; punkt przywracania. Niezapisana praca w innych programach zostanie utracona.</td></tr>
+    <tr><th>Kopiuj stan</th><td>Kopiuje bie&#380;&#261;cy stan do schowka jako zwyk&#322;y tekst &mdash; pomy&#347;lane o wpisie na forum lub zg&#322;oszeniu b&#322;&#281;du.</td></tr>
+  </table></div>
+
+  <h2>Ustawienia</h2>
+  <ul>
+    <li><b>Funkcja w&#322;&#261;czona</b> &mdash; w&#322;&#261;cza lub wy&#322;&#261;cza przywracanie do punktu w czasie.</li>
+    <li><b>Cz&#281;stotliwo&#347;&#263;</b> &mdash; od 1 do 24 godzin mi&#281;dzy punktami przywracania.</li>
+    <li><b>Czas przechowywania</b> &mdash; od 1 do 7 dni, zanim punkt zostanie usuni&#281;ty automatycznie.</li>
+    <li><b>Maksymalne miejsce</b> &mdash; od 2 do 50 GB &#322;&#261;cznie dla wszystkich punkt&oacute;w.</li>
+  </ul>
+  <p>Ka&#380;da lista zaczyna si&#281; od pozycji <b>Ustawienie domy&#347;lne systemu
+     Windows</b>, kt&oacute;ra usuwa t&#281; jedn&#261; zmian&#281;. Pod ka&#380;d&#261;
+     list&#261;, na szaro, wida&#263; warto&#347;&#263; obecnie obowi&#261;zuj&#261;c&#261; i to,
+     sk&#261;d pochodzi.</p>
+
+  <h2>Pięć rzeczy wartych uwagi</h2>
+  <div class="note">
+    <p><b>Cz&#281;stotliwo&#347;&#263; to najmniejszy mo&#380;liwy odst&#281;p, nie
+       obietnica.</b> Punkty przywracania powstaj&#261; tylko wtedy, gdy system jest bezczynny.
+       Gdy komputer jest u&#380;ywany albo wy&#322;&#261;czony, uruchomienie zostaje
+       przesuni&#281;te, a termin mo&#380;e zosta&#263; pomini&#281;ty w ca&#322;o&#347;ci.
+       Ustawienie jednej godziny na komputerze u&#380;ywanym przez ca&#322;y dzie&#324; nie da
+       dwudziestu czterech punkt&oacute;w. Okno pokazuje stan zadania, wi&#281;c oczekuj&#261;ce
+       uruchomienie pozostaje widoczne.</p>
+    <p><b>Obejmowany jest tylko dysk systemu Windows.</b> Pozosta&#322;e partycje i inne dyski
+       nie s&#261; uwzgl&#281;dniane, nawet na tym samym dysku fizycznym. Dane na nich nie
+       s&#261; ani chronione, ani przywracane i nadal wymagaj&#261; w&#322;asnej kopii
+       zapasowej.</p>
+    <p><b>To droga nieoficjalna.</b> Warto&#347;ci konfiguracyjne nie s&#261; udokumentowane
+       przez firm&#281; Microsoft. Przysz&#322;a wersja systemu Windows mo&#380;e je
+       zmieni&#263; &mdash; wtedy po prostu wraca zwyk&#322;e zachowanie systemu.</p>
+    <p><b>&#346;rodowisko odzyskiwania musi istnie&#263;.</b> Punkt przywracania stosuje
+       si&#281; w&#322;a&#347;nie z niego, a nie z poziomu systemu Windows. Okno pokazuje, czy
+       jest dost&#281;pne; gdy jest wy&#322;&#261;czone, punkty nic nie daj&#261; &mdash;
+       polecenie <code>reagentc /enable</code> z uprawnieniami administratora zwykle je
+       przywraca.</p>
+    <p><b>To nie jest kopia zapasowa.</b> Punkty znajduj&#261; si&#281; na tym samym dysku,
+       kt&oacute;ry chroni&#261; &mdash; uszkodzony dysk, skradziony komputer albo wymazany wolumin
+       zabiera je ze sob&#261;. Przywracanie do punktu w czasie jest odpowiedzi&#261; na
+       nieudan&#261; aktualizacj&#281; lub wadliwy sterownik; przeciw awarii sprz&#281;tu,
+       kradzie&#380;y czy ransomware pomaga wy&#322;&#261;cznie kopia zapasowa na osobnym
+       no&#347;niku.</p>
+  </div>
+
+  <h2>Cofni&#281;cie wszystkiego</h2>
+  <p><b>Resetuj wszystko</b> usuwa ca&#322;o&#347;&#263; w jednym kroku. Istniej&#261;ce punkty
+     przywracania nigdy nie s&#261; usuwane przez narz&#281;dzie &mdash; zmienia ono wy&#322;&#261;cznie
+     konfiguracj&#281;.</p>
+  <h2>Wsparcie</h2>
+  <p>Narz&#281;dzie jest bezp&#322;atne i takie pozostanie. Je&#347;li oszcz&#281;dzi&#322;o
+     popo&#322;udnie sp&#281;dzone na ponownej instalacji systemu Windows, kawa mile widziana:
+     <a href="https://www.paypal.me/teslapunk">paypal.me/teslapunk</a>. W samym narz&#281;dziu nigdy nie pojawia si&#281; pro&#347;ba o pieni&#261;dze &mdash;
+     &#380;adnego komunikatu, &#380;adnego odno&#347;nika, &#380;adnego przypomnienia.</p>
 </section>
 
 <footer>
@@ -468,7 +815,7 @@
 </div>
 <script>
 (function () {
-  var CODES = ['en', 'de', 'fr', 'es', 'pt'];
+  var CODES = ['en', 'de', 'fr', 'es', 'pt', 'it', 'pl'];
 
   function pick() {
     var h = (location.hash || '').replace('#', '').toLowerCase();

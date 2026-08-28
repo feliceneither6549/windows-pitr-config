@@ -2,7 +2,7 @@
 
 [![Download pitr-config.cmd](https://img.shields.io/badge/download-pitr--config.cmd-2ea44f?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/henmedia/windows-pitr-config/releases/latest/download/pitr-config.cmd)
 [![Latest release](https://img.shields.io/github/v/release/henmedia/windows-pitr-config?style=for-the-badge&label=version&color=555555)](https://github.com/henmedia/windows-pitr-config/releases/latest)
-[![Guide](https://img.shields.io/badge/guide-EN%20DE%20FR%20ES%20PT-1f6feb?style=for-the-badge)](https://henmedia.github.io/windows-pitr-config/guide.html)
+[![Guide](https://img.shields.io/badge/guide-EN%20DE%20FR%20ES%20PT%20IT%20PL-1f6feb?style=for-the-badge)](https://henmedia.github.io/windows-pitr-config/guide.html)
 
 Configure **Point-in-time restore** (PITR) on Windows 11 — including the frequency and
 retention settings that Microsoft exposes on the Enterprise edition only.
@@ -21,14 +21,26 @@ dependencies, no PowerShell modules. Copy it to a USB stick and run it anywhere.
 > `PITRTask` runs only when the system is idle, so the button lifts that condition for
 > exactly one run and restores it afterwards.
 
-The interface speaks **English, German, French, Spanish and Portuguese**. It starts in
-whichever one matches your Windows display language; the buttons in the top right switch at
-any time. The window also links to the project and to the
+> ### 🔄 And the way back
+>
+> A restore point is applied from the Windows Recovery Environment, not from inside a running
+> Windows. **Restart to recovery** reboots straight into it — from the same window that created
+> the point. Windows does offer that route, under Settings → System → Recovery → Advanced
+> startup, but several clicks away from anything to do with restore points.
+>
+> The line next to the button shows whether that environment exists at all, along with the size
+> and free space of the recovery partition. If it is switched off, no restore point can be
+> applied by anyone, and the tool says so in red instead of leaving it to be discovered on the
+> day it matters.
+
+The interface speaks **English, German, French, Spanish, Portuguese, Italian and Polish**. It
+starts in whichever one matches your Windows display language; the buttons in the top right
+switch at any time. The window also links to the project and to the
 [short guide](https://henmedia.github.io/windows-pitr-config/guide.html), which opens in the
 language you are currently using.
 
 ![The tool running on Windows 11 Pro: current state, existing restore points, and the four
-settings](docs/screenshot.png?v=1.4.1)
+settings](docs/screenshot.png?v=1.5.0b)
 <!-- The ?v= is a cache buster. GitHub proxies README images and caches them by URL,
      so replacing the file alone keeps serving the old picture for a long time.
      Bump this whenever the screenshot is regenerated. -->
@@ -99,6 +111,21 @@ Two consequences worth knowing:
 
 The storage limit this tool sets likewise applies to the OS volume alone. The tool states
 this in its own interface and labels the storage figures with the drive they refer to.
+
+## Not a backup
+
+Point-in-time restore answers a change that went wrong — a bad update, a driver that broke
+something, software that left the machine in a worse state than before. It does not answer
+losing the disk.
+
+The restore points live on the very volume they protect, in the shadow storage area of the
+Windows drive. A failed drive takes them along, and so does a stolen laptop, a wiped or
+re-partitioned volume, or ransomware that gets far enough. There is no copy anywhere else, and
+that is by design: this is a rollback mechanism, not a backup mechanism. The two look similar
+from a distance and fail in completely different ways.
+
+Treat it as the fast way back from a bad afternoon, and keep a real backup on separate media
+for everything else. The tool says the same thing in its own window.
 
 ## How it works
 
@@ -175,7 +202,7 @@ looks like a failure but is none: the tool works from its own full path and neve
 current directory. Since 1.4.1 that message is cleared from the console on start.
 
 A [short guide](https://henmedia.github.io/windows-pitr-config/guide.html) covers the same
-ground in all five languages. Downloading `guide.html` next to `pitr-config.cmd` makes the
+ground in all seven languages. Downloading `guide.html` next to `pitr-config.cmd` makes the
 tool open that local copy instead, which keeps it fully usable on a stick without a network.
 
 Browsers treat `.cmd` files as executable content, so the download may need one confirmation
@@ -193,6 +220,8 @@ Get-FileHash pitr-config.cmd -Algorithm SHA256
 | **Apply and run now** | Writes the values and runs the task immediately, so the schedule is recalculated at once. |
 | **Refresh** | Re-reads the current state. |
 | **Reset everything** | Removes every value this tool has set, after confirmation. |
+| **Restart to recovery** | Restarts Windows into the recovery environment, where a restore point can actually be applied. Asks first; unsaved work in other programs is lost. |
+| **Copy state** | Puts the whole state into the clipboard as plain text — made for a forum post or a bug report. |
 
 For a read-only look at your system — no window, no administrator rights, nothing written:
 
@@ -219,6 +248,29 @@ pitr-config.cmd noupdate
 This is the only network connection the tool makes. The request reveals nothing about your
 system beyond what any web request does — an IP address and a `pitr-config` user agent.
 
+### The recovery environment
+
+A restore point is applied from the Windows Recovery Environment, not from inside a running
+Windows. If that environment is missing or switched off — which happens more often than one
+would think, most visibly during the WinRE servicing failures of early 2024 — then restore
+points are collected that nobody can reach when it matters.
+
+The window therefore shows its state in the *Current state* box, together with the size and
+free space of the recovery partition:
+
+```
+Recovery environment:  available  ·  1151 MB, 106 MB free
+```
+
+If it is switched off, the line turns red and a note appears: an elevated `reagentc /enable`
+usually puts it back. **Restart to recovery** next to that line reboots straight into the
+environment, which is where a point gets applied after something has gone wrong.
+
+The state is read from `%SystemRoot%\System32\Recovery\ReAgent.xml` rather than from the
+output of `reagentc /info`, because that output is translated and this tool speaks seven
+languages. The partition behind it is found through the disk number and byte offset recorded
+in that same file. If any of it fails, the line says *not determinable* — no guess.
+
 ### How the snapshot on demand works
 
 `PITRTask` has `RunOnlyIfIdle = True`. While the machine is actively in use the task stays in
@@ -231,6 +283,42 @@ afterwards, including when an error occurs in between. It writes nothing else: t
 the window are left where they are. **Apply and run now**, at the bottom, does the same thing
 but saves the settings first — the right button when a new frequency should take effect at
 once instead of at the next scheduled run.
+
+### Command line
+
+For startup scripts, remote administration, or setting up several machines the same way, the
+tool also writes without opening a window:
+
+```
+pitr-config.cmd apply freq=4h reten=5d size=20g active=on
+```
+
+| Word | Range | Meaning |
+|---|---|---|
+| `freq` | `60m` to `24h` | interval between restore points |
+| `reten` | `1d` to `7d` | lifetime of a restore point |
+| `size` | `2g` to `50g` | storage limit for all points together |
+| `active` | `on` / `off` | the feature itself |
+| `reset` | — | removes every value this tool has written |
+| `status` | — | prints the values in effect and writes nothing |
+
+Every setting also accepts `default`, which removes that single override again. Hours, minutes
+and days can be written as `90m`, `4h` or `2d`; the size takes `20g` or a plain number of
+megabytes.
+
+It needs an elevated prompt and deliberately does **not** elevate itself: elevation would
+start a new process with its own console, and neither its output nor its exit code would reach
+the calling script. Without administrator rights it says so and returns **5**. A wrong or
+unreadable argument returns **1** and prints the usage; success returns **0**.
+
+Started from a network share, `cmd.exe` prints its UNC warning ahead of the tool, the one the
+window mode clears away. The command line deliberately leaves it: clearing the console there
+would wipe the calling script's own output. It goes to stderr, so `2>nul` in a batch file or
+`2>$null` in PowerShell silences it.
+
+The output of this mode is always English, whatever the display language is. It gets read by
+scripts and pasted into bug reports, and there a stable wording is worth more than a polite
+one. `status` prints the raw level — `GPO`, `CSP`, `UX` — for the same reason.
 
 ## Requirements
 
@@ -273,6 +361,54 @@ executes the lower part as a script block.
 > BOM makes `cmd.exe` trip over the first line. Non-ASCII characters survive regardless,
 > because the loader reads the file as UTF-8 explicitly rather than relying on the console
 > code page.
+
+## Translations
+
+The interface speaks seven languages, and corrections are more welcome than new ones. German
+is the only one a native speaker has gone through line by line. The other six were not, so a
+clumsy phrase, or a term no Windows user in that language would recognise, is entirely
+possible. A pull request fixing a single line is worth as much here as a whole new
+language.
+
+Everything lives in one table near the top of the PowerShell part, one block per language:
+
+```powershell
+$LangText = @{
+    en = @{ btnApply = 'Apply' ... }
+    de = @{ btnApply = 'Übernehmen' ... }
+}
+$LangCodes = @('en', 'de', 'fr', 'es', 'pt', 'it', 'pl')
+```
+
+A new language needs four things: a block copied from `en` and translated, its code appended
+to `$LangCodes`, a button in the XAML next to the others, and one line wiring that button to
+`Set-Lang`. Missing keys fall back to English, so an unfinished block degrades to a mixed
+window rather than to empty labels — a partial translation is a perfectly good pull request.
+
+Four things are worth knowing before starting:
+
+- **Apostrophes are doubled and plain ASCII**: `l''edizione`, not `l'edizione` and never the
+  typographic `’`. Windows PowerShell 5.1 treats the curly quote as a string delimiter just
+  like the straight one, so a single one silently ends the string and the file stops parsing.
+  Accented letters and diacritics are fine as they are — the loader reads the file as UTF-8.
+- **Terminology should follow the Windows interface of that language**, not the dictionary.
+  Where someone recognises the term from their own Windows, a clumsy sentence is forgiven; the
+  other way round it is not.
+- **The text addresses nobody.** No *du/Sie*, no *tu/vous*, no *tú/usted*. In the Romance
+  languages the imperative carries that distinction too, so instructions are phrased as nouns
+  — *Doppio clic su…* rather than *fare clic*.
+- **Plural forms vary.** Polish hours are abbreviated to `godz.` because the full word changes
+  with the number (2 godziny, 5 godzin) and the window shows both cases. Any language with the
+  same problem can do the same.
+
+`pitr-config.cmd selftest` walks through every language and prints the interface of each one
+to the console — headline, notices, buttons, group headers and the filled dropdown lists —
+without opening a window, writing anything, or needing administrator rights. That is the
+fastest way to read a translation in context, and it catches a broken quote immediately,
+because the file then does not parse at all.
+
+The same applies to [docs/guide.html](docs/guide.html), which carries one `<section>` per
+language plus its button and an entry in the `CODES` array of the small script at the bottom.
 
 ## Versioning
 
