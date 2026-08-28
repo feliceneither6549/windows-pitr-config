@@ -1,0 +1,8 @@
+# Zeigt den Sponsor-Knopf oben am Repository an. Bewusst nur hier und nicht im
+# Werkzeug selbst: eine selbst-elevierende .cmd, die in HKLM schreibt, soll keinen
+# Geldlink enthalten - das ist genau das Muster, vor dem Nutzer gewarnt werden.
+#
+# Shows the Sponsor button on the repository. Deliberately here and not inside the
+# tool: a self-elevating .cmd that writes to HKLM has no business carrying a payment
+# link - that is the very pattern users are warned about.
+custom: ["https://www.paypal.me/teslapunk"]
